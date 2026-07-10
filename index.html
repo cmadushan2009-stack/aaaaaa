@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart RC Car - Ultra Sensitive UI</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 10px 40px; 
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            box-sizing: border-box;
+            position: relative;
+            transition: background 0.4s ease;
+        }
+
+        body.nitro-active {
+            background: linear-gradient(135deg, #2d0b13, #110724);
+        }
+
+        /* ඉහළ තොරතුරු පුවරුව */
+        .top-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 20px;
+            border-radius: 14px;
+            font-size: 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 10;
+            margin-bottom: 5px;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 4px 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .bulb-status-box, .horn-status-box {
+            display: none;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-gear {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.2s ease;
+        }
+
+        .status-gear:hover {
+            color: #00f2fe;
+        }
+
+        /* Settings පැනල් එක */
+        .settings-dropdown-panel {
+            position: absolute;
+            top: 60px; 
+            right: 40px; 
+            display: flex;
+            flex-direction: column; 
+            gap: 12px; 
+            background: rgba(15, 23, 42, 0.95);
+            padding: 15px; 
+            border-radius: 14px; 
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            backdrop-filter: blur(15px);
+            opacity: 0;
+            transform: translateY(-20px); 
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 200px; 
+            z-index: 5;
+        }
+
+        .settings-dropdown-panel.show-panel {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .horizontal-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .horizontal-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #00f2fe;
+        }
+
+        .settings-fs-btn {
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            color: #00f2fe;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .settings-fs-btn:active {
+            transform: scale(0.95);
+            background: rgba(0, 242, 254, 0.25);
+        }
+
+        /* ප්‍රධාන පාලක පුවරුව */
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+            padding: 5px 0;
+            z-index: 1;
+        }
+
+        /* වම් සහ දකුණු Groups */
+        .left-controls-group, .right-controls-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Slider Containers */
+        .slider-container-vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 150px; 
+            width: 50px; 
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 30px; 
+            position: relative;
+        }
+
+        .slider-container-horizontal {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px; 
+            width: 170px; /* Slider එකේ පළල */
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 30px; 
+            padding: 0 10px;
+        }
+
+        /* Sliders Styles */
+        .vertical-slider {
+            -webkit-appearance: none;
+            width: 120px;
+            height: 30px; 
+            background: transparent; 
+            transform: rotate(-90deg);
+            outline: none;
+        }
+
+        .horizontal-steer-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 30px;
+            background: transparent;
+            outline: none;
+        }
+
+        /* Sliders Thumbs (කරකවන බෝල) */
+        .vertical-slider::-webkit-slider-thumb, .horizontal-steer-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%; 
+            background: #00f2fe;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
+            cursor: pointer;
+        }
+
+        /* බටන් පේළි */
+        .top-row-pad {
+            display: flex;
+            gap: 10px; 
+        }
+
+        /* 🚀 Ultra-Sensitive Glass Button Style */
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #00f2fe;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            touch-action: none; 
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.05s ease, background 0.05s ease;
+        }
+
+        .horn-btn, .park-btn, .light-main-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            font-size: 22px;
+        }
+
+        .horn-btn {
+            background: rgba(0, 242, 254, 0.05);
+            border-color: rgba(0, 242, 254, 0.2);
+        }
+
+        .horn-btn.active {
+            background: rgba(0, 242, 254, 0.25) !important;
+            box-shadow: 0 0 15px #00f2fe !important;
+            border-color: #00f2fe !important;
+        }
+
+        .nitro-btn {
+            font-size: 30px;
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            background: rgba(217, 83, 79, 0.1);
+            border-color: rgba(217, 83, 79, 0.3);
+        }
+
+        .park-btn {
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .park-active {
+            background: rgba(239, 68, 68, 0.3) !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.5) !important;
+        }
+
+        .light-active {
+            background: rgba(0, 242, 254, 0.15) !important;
+            border-color: #00f2fe !important;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4) !important;
+        }
+
+        .glass-btn.active, .glass-btn:active {
+            transform: scale(0.90);
+        }
+
+        .nitro-btn.active, .nitro-btn:active {
+            background: rgba(255, 0, 0, 0.3) !important;
+            box-shadow: 0 0 20px #ff0000 !important;
+        }
+    </style>
+</head>
+<body id="main-bg">
+
+    <div class="top-status">
+        <div class="status-left">
+            <div id="sys-mode-display" style="font-weight: bold; color: rgba(255,255,255,0.7)">🎮 RC CAR</div>
+            <div class="status-item"><span>🌡️</span> <span id="temp-display" style="color:#ffaa00; font-weight:bold;">34°C</span></div>
+            <div class="status-item"><span id="bat-icon">🔋</span> <span id="bat-display" style="color:#10b981; font-weight:bold;">85%</span></div>
+            <div class="status-item horn-status-box" id="horn-alert-container"><span>🔊</span> <span style="color:#00f2fe; font-weight:bold;">HORN</span></div>
+            <div class="status-item bulb-status-box" id="bulb-container"><span>💡</span> <span id="led-display" style="color:#00f2fe; font-weight:bold;">50%</span></div>
+            <div class="status-item"><span style="color: rgba(255,255,255,0.4);">SPD:</span> <span id="speed-display" style="color:#00f2fe; font-weight:bold;">0%</span></div>
+            <div class="status-item"><span style="color: rgba(255,255,255,0.4);">STR:</span> <span id="steer-display" style="color:#00f2fe; font-weight:bold;">0%</span></div>
+        </div>
+        <div class="status-gear" id="gear-btn" onclick="toggleGearSettings()">⚙️</div>
+    </div>
+
+    <div class="settings-dropdown-panel" id="settings-panel">
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+            <div style="font-size: 10px; color: #00f2fe; font-weight: bold;">☀️ LED BRIGHTNESS</div>
+            <input type="range" min="0" max="100" value="50" class="horizontal-slider" id="led-slider" oninput="updateLED(this.value)">
+        </div>
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 5px 0;">
+        <div class="settings-fs-btn" id="fs-toggle-btn" onclick="toggleFullScreen()">🖥️ FULLSCREEN</div>
+    </div>
+
+    <div class="game-controls">
+        
+        <div class="left-controls-group">
+            <div class="glass-btn nitro-btn" id="btn-nitro">🔥</div>
+            <div class="slider-container-vertical">
+                <input type="range" min="-100" max="100" value="0" class="vertical-slider" id="throttle-slider" oninput="updateSlider(this.value)">
+            </div>
+        </div>
+
+        <div></div> 
+        
+        <div class="right-controls-group">
+            <div class="top-row-pad">
+                <div class="glass-btn horn-btn" id="btn-horn">🔊</div>
+                <div class="glass-btn park-btn" id="btn-park">🛑</div>
+            </div>
+
+            <div class="glass-btn light-main-btn" id="light-btn">🔅</div>
+
+            <div class="slider-container-horizontal">
+                <input type="range" min="-100" max="100" value="0" class="horizontal-steer-slider" id="steer-slider" oninput="updateSteerSlider(this.value)">
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let slider = document.getElementById('throttle-slider');
+        let steerSlider = document.getElementById('steer-slider');
+        let speedDisplay = document.getElementById('speed-display');
+        let steerDisplay = document.getElementById('steer-display');
+        let sysModeDisplay = document.getElementById('sys-mode-display');
+        
+        let isLightOn = false;
+        let isParkMode = false; 
+        
+        let ledSlider = document.getElementById('led-slider');
+        let ledDisplay = document.getElementById('led-display');
+        let bulbContainer = document.getElementById('bulb-container');
+        let hornAlertContainer = document.getElementById('horn-alert-container'); 
+        let lightBtn = document.getElementById('light-btn');
+        let gearBtn = document.getElementById('gear-btn');
+        let settingsPanel = document.getElementById('settings-panel');
+        let bodyBg = document.getElementById('main-bg');
+        let hideTimeout;
+
+        function sendCmd(cmd) {
+            console.log("Action: " + cmd);
+        }
+
+        // ⚡ Full Screen Toggle Logic
+        function toggleFullScreen() {
+            let doc = window.document;
+            let docEl = doc.documentElement;
+            let requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+            let cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+            if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+                if (requestFullScreen) requestFullScreen.call(docEl);
+                document.getElementById('fs-toggle-btn').innerText = "❌ EXIT FULLSCREEN";
+            } else {
+                if (cancelFullScreen) cancelFullScreen.call(doc);
+                document.getElementById('fs-toggle-btn').innerText = "🖥️ FULLSCREEN";
+            }
+            startHideTimer(); 
+        }
+
+        // ⚡ ටච් Sensitive පොදු ඉවෙන්ට් ලොජික්
+        function setupSensitiveButton(id, startCallback, endCallback) {
+            let btn = document.getElementById(id);
+            if(!btn) return;
+            
+            btn.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                btn.classList.add('active');
+                if(startCallback) startCallback();
+            });
+            btn.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                btn.classList.remove('active');
+                if(endCallback) endCallback();
+            });
+            btn.addEventListener('mousedown', function(e) {
+                btn.classList.add('active');
+                if(startCallback) startCallback();
+            });
+            btn.addEventListener('mouseup', function(e) {
+                btn.classList.remove('active');
+                if(endCallback) endCallback();
+            });
+            btn.addEventListener('contextmenu', e => e.preventDefault());
+        }
+
+        // --- බටන්ස් ලොජික් ---
+        setupSensitiveButton('btn-nitro', () => {
+            if(isParkMode) return;
+            bodyBg.classList.add('nitro-active');
+            speedDisplay.innerText = "100%";
+            slider.value = 100;
+            sendCmd('SPEED_100');
+            sendCmd('N_ON');
+        }, () => {
+            if(isParkMode) return;
+            bodyBg.classList.remove('nitro-active');
+            resetSlider();
+            sendCmd('N_OFF');
+        });
+
+        setupSensitiveButton('btn-horn', () => {
+            hornAlertContainer.style.display = "flex";
+            sendCmd('HORN_ON');
+        }, () => {
+            hornAlertContainer.style.display = "none";
+            sendCmd('HORN_OFF');
+        });
+
+        setupSensitiveButton('btn-park', () => {
+            isParkMode = !isParkMode;
+            let parkBtn = document.getElementById('btn-park');
+            if(isParkMode) {
+                parkBtn.classList.add('park-active');
+                sysModeDisplay.innerText = "🛑 PARKED";
+                sysModeDisplay.style.color = "#ef4444";
+                resetSlider();
+                resetSteerSlider();
+                sendCmd('PARK_ON');
+            } else {
+                parkBtn.classList.remove('park-active');
+                sysModeDisplay.innerText = "🎮 RC CAR";
+                sysModeDisplay.style.color = "rgba(255,255,255,0.7)";
+                sendCmd('PARK_OFF');
+            }
+        }, null);
+
+        setupSensitiveButton('light-btn', () => {
+            isLightOn = !isLightOn;
+            if(isLightOn) {
+                lightBtn.classList.add('light-active');
+                bulbContainer.style.display = "flex"; 
+                ledSlider.value = 50; 
+                updateLEDData(50);
+            } else {
+                lightBtn.classList.remove('light-active');
+                settingsPanel.classList.remove('show-panel'); 
+                bulbContainer.style.display = "none"; 
+                clearTimeout(hideTimeout);
+                sendCmd("LED_0");
+            }
+        }, null);
+
+        // --- 🎮 Speed Slider කන්ට්‍රෝල්ස් ---
+        function updateSlider(val) {
+            if(isParkMode) { 
+                slider.value = 0; 
+                speedDisplay.innerText = "0%";
+                return; 
+            }
+            speedDisplay.innerText = val + "%";
+            sendCmd("SPEED_" + val);
+        }
+
+        function resetSlider() {
+            slider.value = 0;
+            speedDisplay.innerText = "0%";
+            sendCmd("SPEED_0");
+        }
+
+        slider.addEventListener('touchend', resetSlider);
+        slider.addEventListener('mouseup', resetSlider);
+
+
+        // --- ◀ 🕹️ Steering Slider කන්ට්‍රෝල්ස් ▶ ---
+        function updateSteerSlider(val) {
+            if(isParkMode) {
+                steerSlider.value = 0;
+                steerDisplay.innerText = "0%";
+                return;
+            }
+            steerDisplay.innerText = val + "%";
+            sendCmd("STEER_" + val); // Arduino එකට STEER_50 හෝ STEER_-30 වැනි අගයන් යයි
+        }
+
+        function resetSteerSlider() {
+            steerSlider.value = 0;
+            steerDisplay.innerText = "0%";
+            sendCmd("STEER_0"); // අත ඇරපු ගමන් රෝද මැදට එනවා
+        }
+
+        steerSlider.addEventListener('touchend', resetSteerSlider);
+        steerSlider.addEventListener('mouseup', resetSteerSlider);
+
+
+        // --- Settings Panel ---
+        function toggleGearSettings() {
+            if(settingsPanel.classList.contains('show-panel')) {
+                settingsPanel.classList.remove('show-panel');
+                clearTimeout(hideTimeout);
+            } else {
+                settingsPanel.classList.add('show-panel');
+                startHideTimer();
+            }
+        }
+
+        function updateLED(val) {
+            updateLEDData(val);
+            startHideTimer(); 
+        }
+
+        function updateLEDData(val) {
+            ledDisplay.innerText = val + "%"; 
+            sendCmd("LED_" + val);
+        }
+
+        function startHideTimer() {
+            clearTimeout(hideTimeout);
+            hideTimeout = setTimeout(() => {
+                settingsPanel.classList.remove('show-panel');
+            }, 4000); 
+        }
+
+        // --- Keyboard Controls ---
+        const keyMap = { 'KeyW': 'W', 'KeyS': 'S', 'KeyA': 'A', 'KeyD': 'D', 'Space': 'N_ON', 'KeyH': 'HORN', 'KeyP': 'PARK', 'KeyL': 'LIGHT' };
+        let activeKey = null;
+
+        window.addEventListener('keydown', function(e) {
+            if(keyMap[e.code] && activeKey !== e.code) {
+                activeKey = e.code;
+                let cmd = keyMap[e.code];
+                if(cmd === 'PARK') document.getElementById('btn-park').dispatchEvent(new Event('mousedown'));
+                if(cmd === 'LIGHT') document.getElementById('light-btn').dispatchEvent(new Event('mousedown'));
+                if(isParkMode && (cmd === 'W' || cmd === 'S' || cmd === 'Space' || cmd === 'A' || cmd === 'D')) return;
+                if(cmd === 'W') { slider.value = 100; updateSlider(100); }
+                if(cmd === 'S') { slider.value = -100; updateSlider(-100); }
+                if(cmd === 'A') { steerSlider.value = -100; updateSteerSlider(-100); }
+                if(cmd === 'D') { steerSlider.value = 100; updateSteerSlider(100); }
+                if(cmd === 'Space') document.getElementById('btn-nitro').dispatchEvent(new Event('mousedown'));
+                if(cmd === 'HORN') document.getElementById('btn-horn').dispatchEvent(new Event('mousedown'));
+            }
+        });
+
+        window.addEventListener('keyup', function(e) {
+            if(keyMap[e.code] && activeKey === e.code) {
+                activeKey = null;
+                let cmd = keyMap[e.code];
+                if(cmd === 'W' || cmd === 'S') resetSlider();
+                if(cmd === 'A' || cmd === 'D') resetSteerSlider();
+                if(cmd === 'Space') document.getElementById('btn-nitro').dispatchEvent(new Event('mouseup'));
+                if(cmd === 'HORN') document.getElementById('btn-horn').dispatchEvent(new Event('mouseup'));
+            }
+        });
+    </script>
+</body>
+</html>
