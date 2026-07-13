@@ -3,14 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Smart RC Car - Ultra Sensitive UI</title>
+    <title>Futuristic RC Car Control</title>
     <style>
+        :root {
+            --primary-glow: #00f2fe;
+            --neon-blue: #00d2ff;
+            --neon-red: #ff0055;
+            --neon-orange: #ff9900;
+            --neon-purple: #b624ff;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.07);
+            --panel-bg: rgba(6, 10, 26, 0.85);
+        }
+
         body {
-            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            background: radial-gradient(circle at center, #0f1026, #050510, #000000);
             color: #ffffff;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
             margin: 0;
-            padding: 10px 40px; 
+            padding: 20px 40px; 
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -20,300 +31,412 @@
             -webkit-user-select: none;
             box-sizing: border-box;
             position: relative;
-            transition: background 0.4s ease;
+            transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body.nitro-active {
-            background: linear-gradient(135deg, #2d0b13, #110724);
+            background: radial-gradient(circle at center, #3a0010, #100005, #000000);
+            animation: pulseBg 1s infinite alternate;
         }
 
-        /* ඉහළ තොරතුරු පුවරුව */
+        @keyframes pulseBg {
+            0% { background-color: #000000; }
+            100% { background-color: #120004; }
+        }
+
+        /* 📊 Top Status Bar */
         .top-status {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 8px 20px;
-            border-radius: 14px;
-            font-size: 14px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            background: rgba(10, 15, 30, 0.5);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            padding: 12px 28px;
+            border-radius: 20px;
+            font-size: 13px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255,255,255,0.05);
             position: relative;
             z-index: 10;
-            margin-bottom: 5px;
         }
 
         .status-left {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 14px;
+            flex-wrap: wrap;
         }
 
         .status-item {
             display: flex;
             align-items: center;
-            gap: 5px;
-            background: rgba(255, 255, 255, 0.04);
-            padding: 4px 10px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 8px;
+            background: var(--glass-bg);
+            padding: 7px 14px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        .bulb-status-box, .horn-status-box {
+        .bulb-status-box, .rgb-status-box, .horn-status-box {
             display: none;
             align-items: center;
             gap: 5px;
+            animation: pulseGlow 1.5s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        /* 🌐 WS Connection Badge */
+        .ws-status-badge {
+            font-size: 10px;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 30px;
+            background: rgba(255, 0, 85, 0.15);
+            color: var(--neon-red);
+            border: 1px solid rgba(255, 0, 85, 0.3);
+            text-shadow: 0 0 5px var(--neon-red);
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .ws-connected {
+            background: rgba(0, 242, 254, 0.15);
+            color: var(--primary-glow);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            text-shadow: 0 0 5px var(--primary-glow);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
         }
 
         .status-gear {
-            font-size: 20px;
+            font-size: 24px;
             color: rgba(255, 255, 255, 0.4);
             cursor: pointer;
-            padding: 5px;
-            transition: color 0.2s ease;
+            padding: 4px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .status-gear:hover {
-            color: #00f2fe;
+            color: var(--primary-glow);
+            transform: rotate(60deg) scale(1.1);
+            text-shadow: 0 0 10px var(--primary-glow);
         }
 
-        /* Settings පැනල් එක */
+        /* ⚙️ Settings Panel */
         .settings-dropdown-panel {
             position: absolute;
-            top: 60px; 
+            top: 85px; 
             right: 40px; 
             display: flex;
             flex-direction: column; 
-            gap: 12px; 
-            background: rgba(15, 23, 42, 0.95);
-            padding: 15px; 
-            border-radius: 14px; 
-            border: 1px solid rgba(0, 242, 254, 0.3);
-            backdrop-filter: blur(15px);
+            gap: 16px; 
+            background: var(--panel-bg);
+            padding: 24px; 
+            border-radius: 24px; 
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
             opacity: 0;
-            transform: translateY(-20px); 
+            transform: translateY(-20px) scale(0.93); 
             pointer-events: none;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 200px; 
-            z-index: 5;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 240px; 
+            z-index: 100;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.1);
         }
 
         .settings-dropdown-panel.show-panel {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
             pointer-events: auto;
+        }
+
+        .panel-label {
+            font-size: 10px; 
+            font-weight: 800; 
+            letter-spacing: 1px;
+            margin-bottom: 4px;
         }
 
         .horizontal-slider {
             -webkit-appearance: none;
+            appearance: none;
             width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
             outline: none;
         }
 
         .horizontal-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 14px;
-            height: 14px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
-            background: #00f2fe;
+            background: var(--primary-glow);
+            box-shadow: 0 0 12px var(--primary-glow);
+            cursor: pointer;
+            border: 2px solid #ffffff;
+        }
+
+        .color-picker-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .advanced-picker {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 55px;
+            height: 32px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .advanced-picker::-webkit-color-swatch {
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
         .settings-fs-btn {
-            background: rgba(0, 242, 254, 0.1);
-            border: 1px solid rgba(0, 242, 254, 0.3);
-            color: #00f2fe;
-            padding: 8px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(0,242,254,0.1), rgba(0,210,255,0.03));
+            border: 1px solid rgba(0,242,254,0.3);
+            color: var(--primary-glow);
+            padding: 10px;
+            border-radius: 12px;
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
+            letter-spacing: 0.5px;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+            transition: all 0.2s;
         }
 
         .settings-fs-btn:active {
-            transform: scale(0.95);
-            background: rgba(0, 242, 254, 0.25);
+            background: rgba(0,242,254,0.2);
+            transform: scale(0.97);
         }
 
-        /* ප්‍රධාන පාලක පුවරුව */
+        /* 🎨 Game Controls Layout */
         .game-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex: 1;
-            padding: 5px 0;
+            padding: 20px 0 10px 0;
             z-index: 1;
         }
 
-        /* වම් සහ දකුණු Groups */
         .left-controls-group, .right-controls-group {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 20px;
         }
 
-        /* Slider Containers */
         .slider-container-vertical {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 150px; 
-            width: 50px; 
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 30px; 
-            position: relative;
+            height: 180px; 
+            width: 60px; 
+            background: rgba(5, 5, 15, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 35px; 
+            box-shadow: inset 0 8px 20px rgba(0,0,0,0.6), 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .slider-container-horizontal {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 50px; 
-            width: 170px; /* Slider එකේ පළල */
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 30px; 
-            padding: 0 10px;
+            height: 60px; 
+            width: 210px; 
+            background: rgba(5, 5, 15, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 35px; 
+            padding: 0 12px;
+            box-shadow: inset 0 8px 20px rgba(0,0,0,0.6), 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        /* Sliders Styles */
         .vertical-slider {
             -webkit-appearance: none;
-            width: 120px;
-            height: 30px; 
+            appearance: none;
+            width: 150px;
+            height: 40px; 
             background: transparent; 
             transform: rotate(-90deg);
             outline: none;
+            cursor: pointer;
         }
 
         .horizontal-steer-slider {
             -webkit-appearance: none;
+            appearance: none;
             width: 100%;
-            height: 30px;
+            height: 40px;
             background: transparent;
             outline: none;
-        }
-
-        /* Sliders Thumbs (කරකවන බෝල) */
-        .vertical-slider::-webkit-slider-thumb, .horizontal-steer-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%; 
-            background: #00f2fe;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
             cursor: pointer;
         }
 
-        /* බටන් පේළි */
-        .top-row-pad {
-            display: flex;
-            gap: 10px; 
+        .vertical-slider::-webkit-slider-thumb, 
+        .horizontal-steer-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%; 
+            background: radial-gradient(circle at 35% 35%, #ffffff, var(--primary-glow));
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.6), inset 0 -2px 5px rgba(0,0,0,0.2);
+            border: 2px solid rgba(255,255,255,0.8);
         }
 
-        /* 🚀 Ultra-Sensitive Glass Button Style */
+        .top-row-pad {
+            display: flex;
+            gap: 20px; 
+        }
+
+        /* Cyberpunk Glass Buttons */
         .glass-btn {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #00f2fe;
+            background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            border: 1px solid var(--glass-border);
+            color: rgba(255, 255, 255, 0.7);
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255,255,255,0.05);
             touch-action: none; 
             -webkit-tap-highlight-color: transparent;
-            transition: transform 0.05s ease, background 0.05s ease;
+            cursor: pointer;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .horn-btn, .park-btn, .light-main-btn {
-            width: 55px;
-            height: 55px;
+        .horn-btn, .park-btn, .light-main-btn, .rgb-toggle-btn {
+            width: 62px;
+            height: 62px;
             border-radius: 50%;
-            font-size: 22px;
+            font-size: 24px;
         }
 
-        .horn-btn {
-            background: rgba(0, 242, 254, 0.05);
-            border-color: rgba(0, 242, 254, 0.2);
-        }
-
+        .horn-btn { color: var(--neon-blue); border-color: rgba(0, 210, 255, 0.2); }
         .horn-btn.active {
-            background: rgba(0, 242, 254, 0.25) !important;
-            box-shadow: 0 0 15px #00f2fe !important;
-            border-color: #00f2fe !important;
+            background: linear-gradient(135deg, #00f2fe, #00d2ff) !important;
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.6) !important;
+            color: #000;
+            border-color: #fff;
         }
 
         .nitro-btn {
-            font-size: 30px;
-            width: 75px;
-            height: 75px;
+            font-size: 34px;
+            width: 84px;
+            height: 84px;
             border-radius: 50%;
-            background: rgba(217, 83, 79, 0.1);
-            border-color: rgba(217, 83, 79, 0.3);
+            background: rgba(255, 0, 85, 0.02);
+            border-color: rgba(255, 0, 85, 0.15);
+            color: var(--neon-red);
+        }
+
+        .nitro-btn.active {
+            background: linear-gradient(135deg, #ff0055, #ff5e00) !important;
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.7) !important;
+            color: #fff;
+            border-color: rgba(255,255,255,0.5);
         }
 
         .park-btn {
-            background: rgba(239, 68, 68, 0.05);
-            border-color: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
+            background: rgba(255, 153, 0, 0.02);
+            border-color: rgba(255, 153, 0, 0.15);
+            color: var(--neon-orange);
         }
 
         .park-active {
-            background: rgba(239, 68, 68, 0.3) !important;
-            border-color: #ef4444 !important;
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.5) !important;
+            background: linear-gradient(135deg, #ff9900, #ff5500) !important;
+            border-color: rgba(255,255,255,0.4) !important;
+            box-shadow: 0 0 25px rgba(255, 153, 0, 0.6) !important;
+            color: #fff;
+        }
+
+        .light-main-btn {
+            color: #ffe600;
+            border-color: rgba(255, 230, 0, 0.15);
         }
 
         .light-active {
-            background: rgba(0, 242, 254, 0.15) !important;
-            border-color: #00f2fe !important;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4) !important;
+            background: linear-gradient(135deg, #ffe600, #ff9900) !important;
+            border-color: rgba(255,255,255,0.4) !important;
+            box-shadow: 0 0 25px rgba(255, 230, 0, 0.6) !important;
+            color: #000;
         }
 
-        .glass-btn.active, .glass-btn:active {
-            transform: scale(0.90);
+        .rgb-toggle-btn {
+            color: var(--neon-purple);
+            border-color: rgba(182, 36, 255, 0.15);
         }
 
-        .nitro-btn.active, .nitro-btn:active {
-            background: rgba(255, 0, 0, 0.3) !important;
-            box-shadow: 0 0 20px #ff0000 !important;
+        .rgb-active {
+            background: linear-gradient(135deg, #b624ff, #8000ff) !important;
+            border-color: rgba(255,255,255,0.4) !important;
+            box-shadow: 0 0 25px rgba(182, 36, 255, 0.6) !important;
+            color: #fff;
         }
+
+        .glass-btn:active:not(.active) { transform: scale(0.90); }
+        .glass-btn.active { transform: scale(0.90); }
     </style>
 </head>
 <body id="main-bg">
 
     <div class="top-status">
         <div class="status-left">
-            <div id="sys-mode-display" style="font-weight: bold; color: rgba(255,255,255,0.7)">🎮 RC CAR</div>
-            <div class="status-item"><span>🌡️</span> <span id="temp-display" style="color:#ffaa00; font-weight:bold;">34°C</span></div>
-            <div class="status-item"><span id="bat-icon">🔋</span> <span id="bat-display" style="color:#10b981; font-weight:bold;">85%</span></div>
-            <div class="status-item horn-status-box" id="horn-alert-container"><span>🔊</span> <span style="color:#00f2fe; font-weight:bold;">HORN</span></div>
-            <div class="status-item bulb-status-box" id="bulb-container"><span>💡</span> <span id="led-display" style="color:#00f2fe; font-weight:bold;">50%</span></div>
-            <div class="status-item"><span style="color: rgba(255,255,255,0.4);">SPD:</span> <span id="speed-display" style="color:#00f2fe; font-weight:bold;">0%</span></div>
-            <div class="status-item"><span style="color: rgba(255,255,255,0.4);">STR:</span> <span id="steer-display" style="color:#00f2fe; font-weight:bold;">0%</span></div>
+            <div id="sys-mode-display" style="font-weight: 800; color: rgba(255,255,255,0.9); letter-spacing: 1.5px; font-size: 14px;">🎮 CYBER RC</div>
+            <div class="status-item"><span id="ws-status" class="ws-status-badge">DISCONNECTED</span></div>
+            <div class="status-item"><span>🌡️</span> <span id="temp-display" style="color:var(--neon-orange); font-weight:bold;">34°C</span></div>
+            <div class="status-item"><span id="bat-icon">🔋</span> <span id="bat-display" style="color:var(--primary-glow); font-weight:bold;">85%</span></div>
+            <div class="status-item horn-status-box" id="horn-alert-container"><span>🔊</span> <span style="color: var(--primary-glow); font-weight:bold;">HORN</span></div>
+            
+            <div class="status-item bulb-status-box" id="bulb-container"><span>💡</span> <span id="led-display" style="color: #ffe600; font-weight:bold;">LED: 100%</span></div>
+            
+            <div class="status-item rgb-status-box" id="rgb-container"><span>✨</span> <span id="rgb-display" style="color: var(--neon-purple); font-weight:bold;">RGB ON</span></div>
+            
+            <div class="status-item"><span style="color: rgba(255,255,255,0.4); font-size:11px; font-weight: bold;">SPD:</span> <span id="speed-display" style="color: var(--primary-glow); font-weight:bold; min-width:35px;">0%</span></div>
+            <div class="status-item"><span style="color: rgba(255,255,255,0.4); font-size:11px; font-weight: bold;">STR:</span> <span id="steer-display" style="color: var(--primary-glow); font-weight:bold; min-width:35px;">0%</span></div>
         </div>
-        <div class="status-gear" id="gear-btn" onclick="toggleGearSettings()">⚙️</div>
+        
+        <div class="status-gear" id="gear-btn">⚙️</div>
     </div>
 
     <div class="settings-dropdown-panel" id="settings-panel">
-        <div style="display: flex; flex-direction: column; gap: 5px;">
-            <div style="font-size: 10px; color: #00f2fe; font-weight: bold;">☀️ LED BRIGHTNESS</div>
-            <input type="range" min="0" max="100" value="50" class="horizontal-slider" id="led-slider" oninput="updateLED(this.value)">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div class="panel-label" style="color: #ffe600;">☀️ HEADLIGHT BRIGHTNESS</div>
+            <input type="range" min="0" max="100" value="100" class="horizontal-slider" id="headlight-slider" oninput="updateHeadlightBrightness(this.value)">
         </div>
-        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 5px 0;">
-        <div class="settings-fs-btn" id="fs-toggle-btn" onclick="toggleFullScreen()">🖥️ FULLSCREEN</div>
+
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.06); margin: 4px 0;">
+
+        <div class="color-picker-row">
+            <div class="panel-label" style="color: var(--neon-purple);">✨ CAR RGB COLOR</div>
+            <input type="color" id="adv-color-picker" class="advanced-picker" value="#ffffff" oninput="pickCarColor(this.value)">
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.06); margin: 4px 0;">
+        
+        <div class="settings-fs-btn" onclick="toggleFullScreen()">🖥️ FULLSCREEN MODE</div>
     </div>
 
     <div class="game-controls">
@@ -325,7 +448,7 @@
             </div>
         </div>
 
-        <div></div> 
+        <div style="flex: 1;"></div> 
         
         <div class="right-controls-group">
             <div class="top-row-pad">
@@ -333,7 +456,10 @@
                 <div class="glass-btn park-btn" id="btn-park">🛑</div>
             </div>
 
-            <div class="glass-btn light-main-btn" id="light-btn">🔅</div>
+            <div class="top-row-pad">
+                <div class="glass-btn light-main-btn" id="light-btn">🔅</div>
+                <div class="glass-btn rgb-toggle-btn" id="rgb-toggle-btn">✨</div>
+            </div>
 
             <div class="slider-container-horizontal">
                 <input type="range" min="-100" max="100" value="0" class="horizontal-steer-slider" id="steer-slider" oninput="updateSteerSlider(this.value)">
@@ -343,73 +469,186 @@
     </div>
 
     <script>
-        let slider = document.getElementById('throttle-slider');
-        let steerSlider = document.getElementById('steer-slider');
-        let speedDisplay = document.getElementById('speed-display');
-        let steerDisplay = document.getElementById('steer-display');
-        let sysModeDisplay = document.getElementById('sys-mode-display');
+        const slider = document.getElementById('throttle-slider');
+        const steerSlider = document.getElementById('steer-slider');
+        const speedDisplay = document.getElementById('speed-display');
+        const steerDisplay = document.getElementById('steer-display');
+        const sysModeDisplay = document.getElementById('sys-mode-display');
+        
+        const gearBtn = document.getElementById('gear-btn');
+        const settingsPanel = document.getElementById('settings-panel');
+        const rgbToggleBtn = document.getElementById('rgb-toggle-btn');
+        const wsStatusBadge = document.getElementById('ws-status');
+        const headlightSlider = document.getElementById('headlight-slider');
         
         let isLightOn = false;
         let isParkMode = false; 
-        
-        let ledSlider = document.getElementById('led-slider');
-        let ledDisplay = document.getElementById('led-display');
-        let bulbContainer = document.getElementById('bulb-container');
-        let hornAlertContainer = document.getElementById('horn-alert-container'); 
-        let lightBtn = document.getElementById('light-btn');
-        let gearBtn = document.getElementById('gear-btn');
-        let settingsPanel = document.getElementById('settings-panel');
-        let bodyBg = document.getElementById('main-bg');
-        let hideTimeout;
+        let isRGBOn = false;
+        let savedHexColor = "FFFFFF"; 
+        let headlightBrightnessValue = 100; 
 
-        function sendCmd(cmd) {
-            console.log("Action: " + cmd);
+        const bulbContainer = document.getElementById('bulb-container');
+        const ledDisplay = document.getElementById('led-display');
+        const rgbContainer = document.getElementById('rgb-container');
+        const hornAlertContainer = document.getElementById('horn-alert-container'); 
+        const lightBtn = document.getElementById('light-btn');
+        const bodyBg = document.getElementById('main-bg');
+
+        // 🌐 WebSocket Connection
+        let ws;
+        function initWebSocket() {
+            let wsGateway = `ws://${window.location.hostname}/ws`;
+            if(window.location.hostname === "") {
+                wsGateway = "ws://192.168.4.1/ws"; 
+            }
+            ws = new WebSocket(wsGateway);
+
+            ws.onopen = function() {
+                wsStatusBadge.innerText = "LIVE CONNECTED";
+                wsStatusBadge.classList.add('ws-connected');
+            };
+            ws.onclose = function() {
+                wsStatusBadge.innerText = "DISCONNECTED";
+                wsStatusBadge.classList.remove('ws-connected');
+                setTimeout(initWebSocket, 2000); 
+            };
         }
 
-        // ⚡ Full Screen Toggle Logic
+        function sendCmd(cmd) {
+            console.log("Sent: " + cmd);
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(cmd);
+            }
+        }
+
+        // --- 📊 Top Indicators Sync ---
+        function syncTopStatusUI() {
+            if (isLightOn && headlightBrightnessValue > 0) {
+                bulbContainer.style.display = "flex";
+                ledDisplay.innerText = "LED: " + headlightBrightnessValue + "%";
+            } else {
+                bulbContainer.style.display = "none";
+            }
+
+            if (isRGBOn) {
+                rgbContainer.style.display = "flex";
+            } else {
+                rgbContainer.style.display = "none";
+            }
+        }
+
+        // --- ☀️ Headlight Brightness Slider Logic ---
+        function updateHeadlightBrightness(val) {
+            headlightBrightnessValue = val;
+            sendCmd("HEADLIGHT_" + val); 
+            
+            if(val == 0) {
+                lightBtn.classList.remove('light-active');
+                isLightOn = false;
+            } else {
+                lightBtn.classList.add('light-active');
+                isLightOn = true;
+            }
+            syncTopStatusUI();
+        }
+
+        // --- 🎨 RGB Color Picker Logic ---
+        function pickCarColor(hexColor) {
+            savedHexColor = hexColor.replace("#", "").toUpperCase();
+            isRGBOn = true;
+            rgbToggleBtn.classList.add('rgb-active');
+            sendCmd("RGB_" + savedHexColor);
+            syncTopStatusUI();
+        }
+
+        // --- 🪄 Main RGB Toggle Button ---
+        setupSensitiveButton('rgb-toggle-btn', () => {
+            isRGBOn = !isRGBOn;
+            if(isRGBOn) {
+                rgbToggleBtn.classList.add('rgb-active');
+                sendCmd("RGB_" + savedHexColor); 
+            } else {
+                rgbToggleBtn.classList.remove('rgb-active');
+                sendCmd("RGB_OFF");
+            }
+            syncTopStatusUI();
+        }, null, true);
+
+        // --- Headlight Toggle Button ---
+        setupSensitiveButton('light-btn', () => {
+            isLightOn = !isLightOn;
+            if(isLightOn) {
+                lightBtn.classList.add('light-active');
+                headlightBrightnessValue = 100;
+                headlightSlider.value = 100;
+                sendCmd("HEADLIGHT_100");
+            } else {
+                lightBtn.classList.remove('light-active');
+                headlightBrightnessValue = 0;
+                headlightSlider.value = 0;
+                sendCmd("HEADLIGHT_0");
+            }
+            syncTopStatusUI();
+        }, null, true);
+
+        // --- ⚙️ Menu Control & Click Outside Hide ---
+        gearBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            settingsPanel.classList.toggle('show-panel');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!settingsPanel.contains(e.target) && e.target !== gearBtn) {
+                settingsPanel.classList.remove('show-panel');
+            }
+        });
+
+        document.addEventListener('touchstart', (e) => {
+            if (!settingsPanel.contains(e.target) && e.target !== gearBtn) {
+                settingsPanel.classList.remove('show-panel');
+            }
+        });
+
+        // --- Fullscreen Logic ---
         function toggleFullScreen() {
             let doc = window.document;
             let docEl = doc.documentElement;
             let requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
-            let cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
-
             if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
                 if (requestFullScreen) requestFullScreen.call(docEl);
-                document.getElementById('fs-toggle-btn').innerText = "❌ EXIT FULLSCREEN";
             } else {
+                let cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
                 if (cancelFullScreen) cancelFullScreen.call(doc);
-                document.getElementById('fs-toggle-btn').innerText = "🖥️ FULLSCREEN";
             }
-            startHideTimer(); 
+            settingsPanel.classList.remove('show-panel');
         }
 
-        // ⚡ ටච් Sensitive පොදු ඉවෙන්ට් ලොජික්
-        function setupSensitiveButton(id, startCallback, endCallback) {
+        // --- Touch/Mouse Sensitivity Setup ---
+        function setupSensitiveButton(id, startCallback, endCallback, isToggle = false) {
             let btn = document.getElementById(id);
             if(!btn) return;
             
-            btn.addEventListener('touchstart', function(e) {
-                e.preventDefault();
-                btn.classList.add('active');
+            const handleStart = (e) => {
+                if(e) e.preventDefault();
+                if(!isToggle) btn.classList.add('active');
                 if(startCallback) startCallback();
-            });
-            btn.addEventListener('touchend', function(e) {
-                e.preventDefault();
-                btn.classList.remove('active');
+            };
+
+            const handleEnd = (e) => {
+                if(e) e.preventDefault();
+                if(!isToggle) btn.classList.remove('active');
                 if(endCallback) endCallback();
-            });
-            btn.addEventListener('mousedown', function(e) {
-                btn.classList.add('active');
-                if(startCallback) startCallback();
-            });
-            btn.addEventListener('mouseup', function(e) {
-                btn.classList.remove('active');
-                if(endCallback) endCallback();
-            });
+            };
+
+            btn.addEventListener('touchstart', handleStart);
+            btn.addEventListener('touchend', handleEnd);
+            btn.addEventListener('mousedown', handleStart);
+            btn.addEventListener('mouseup', handleEnd);
+            btn.addEventListener('mouseleave', () => { if(!isToggle) btn.classList.remove('active'); });
             btn.addEventListener('contextmenu', e => e.preventDefault());
         }
 
-        // --- බටන්ස් ලොජික් ---
+        // --- Driving Triggers ---
         setupSensitiveButton('btn-nitro', () => {
             if(isParkMode) return;
             bodyBg.classList.add('nitro-active');
@@ -438,134 +677,47 @@
             if(isParkMode) {
                 parkBtn.classList.add('park-active');
                 sysModeDisplay.innerText = "🛑 PARKED";
-                sysModeDisplay.style.color = "#ef4444";
-                resetSlider();
-                resetSteerSlider();
+                sysModeDisplay.style.color = "var(--neon-red)";
+                resetSlider(); resetSteerSlider();
                 sendCmd('PARK_ON');
             } else {
                 parkBtn.classList.remove('park-active');
-                sysModeDisplay.innerText = "🎮 RC CAR";
-                sysModeDisplay.style.color = "rgba(255,255,255,0.7)";
+                sysModeDisplay.innerText = "🎮 CYBER RC";
+                sysModeDisplay.style.color = "rgba(255,255,255,0.9)";
                 sendCmd('PARK_OFF');
             }
-        }, null);
+        }, null, true);
 
-        setupSensitiveButton('light-btn', () => {
-            isLightOn = !isLightOn;
-            if(isLightOn) {
-                lightBtn.classList.add('light-active');
-                bulbContainer.style.display = "flex"; 
-                ledSlider.value = 50; 
-                updateLEDData(50);
-            } else {
-                lightBtn.classList.remove('light-active');
-                settingsPanel.classList.remove('show-panel'); 
-                bulbContainer.style.display = "none"; 
-                clearTimeout(hideTimeout);
-                sendCmd("LED_0");
-            }
-        }, null);
-
-        // --- 🎮 Speed Slider කන්ට්‍රෝල්ස් ---
+        // --- Sliders Moving Logic ---
         function updateSlider(val) {
-            if(isParkMode) { 
-                slider.value = 0; 
-                speedDisplay.innerText = "0%";
-                return; 
-            }
+            if(isParkMode) { slider.value = 0; speedDisplay.innerText = "0%"; return; }
             speedDisplay.innerText = val + "%";
             sendCmd("SPEED_" + val);
         }
 
         function resetSlider() {
-            slider.value = 0;
-            speedDisplay.innerText = "0%";
+            slider.value = 0; speedDisplay.innerText = "0%";
             sendCmd("SPEED_0");
         }
 
         slider.addEventListener('touchend', resetSlider);
         slider.addEventListener('mouseup', resetSlider);
 
-
-        // --- ◀ 🕹️ Steering Slider කන්ට්‍රෝල්ස් ▶ ---
         function updateSteerSlider(val) {
-            if(isParkMode) {
-                steerSlider.value = 0;
-                steerDisplay.innerText = "0%";
-                return;
-            }
+            if(isParkMode) { steerSlider.value = 0; steerDisplay.innerText = "0%"; return; }
             steerDisplay.innerText = val + "%";
-            sendCmd("STEER_" + val); // Arduino එකට STEER_50 හෝ STEER_-30 වැනි අගයන් යයි
+            sendCmd("STEER_" + val);
         }
 
         function resetSteerSlider() {
-            steerSlider.value = 0;
-            steerDisplay.innerText = "0%";
-            sendCmd("STEER_0"); // අත ඇරපු ගමන් රෝද මැදට එනවා
+            steerSlider.value = 0; steerDisplay.innerText = "0%";
+            sendCmd("STEER_0");
         }
 
         steerSlider.addEventListener('touchend', resetSteerSlider);
         steerSlider.addEventListener('mouseup', resetSteerSlider);
 
-
-        // --- Settings Panel ---
-        function toggleGearSettings() {
-            if(settingsPanel.classList.contains('show-panel')) {
-                settingsPanel.classList.remove('show-panel');
-                clearTimeout(hideTimeout);
-            } else {
-                settingsPanel.classList.add('show-panel');
-                startHideTimer();
-            }
-        }
-
-        function updateLED(val) {
-            updateLEDData(val);
-            startHideTimer(); 
-        }
-
-        function updateLEDData(val) {
-            ledDisplay.innerText = val + "%"; 
-            sendCmd("LED_" + val);
-        }
-
-        function startHideTimer() {
-            clearTimeout(hideTimeout);
-            hideTimeout = setTimeout(() => {
-                settingsPanel.classList.remove('show-panel');
-            }, 4000); 
-        }
-
-        // --- Keyboard Controls ---
-        const keyMap = { 'KeyW': 'W', 'KeyS': 'S', 'KeyA': 'A', 'KeyD': 'D', 'Space': 'N_ON', 'KeyH': 'HORN', 'KeyP': 'PARK', 'KeyL': 'LIGHT' };
-        let activeKey = null;
-
-        window.addEventListener('keydown', function(e) {
-            if(keyMap[e.code] && activeKey !== e.code) {
-                activeKey = e.code;
-                let cmd = keyMap[e.code];
-                if(cmd === 'PARK') document.getElementById('btn-park').dispatchEvent(new Event('mousedown'));
-                if(cmd === 'LIGHT') document.getElementById('light-btn').dispatchEvent(new Event('mousedown'));
-                if(isParkMode && (cmd === 'W' || cmd === 'S' || cmd === 'Space' || cmd === 'A' || cmd === 'D')) return;
-                if(cmd === 'W') { slider.value = 100; updateSlider(100); }
-                if(cmd === 'S') { slider.value = -100; updateSlider(-100); }
-                if(cmd === 'A') { steerSlider.value = -100; updateSteerSlider(-100); }
-                if(cmd === 'D') { steerSlider.value = 100; updateSteerSlider(100); }
-                if(cmd === 'Space') document.getElementById('btn-nitro').dispatchEvent(new Event('mousedown'));
-                if(cmd === 'HORN') document.getElementById('btn-horn').dispatchEvent(new Event('mousedown'));
-            }
-        });
-
-        window.addEventListener('keyup', function(e) {
-            if(keyMap[e.code] && activeKey === e.code) {
-                activeKey = null;
-                let cmd = keyMap[e.code];
-                if(cmd === 'W' || cmd === 'S') resetSlider();
-                if(cmd === 'A' || cmd === 'D') resetSteerSlider();
-                if(cmd === 'Space') document.getElementById('btn-nitro').dispatchEvent(new Event('mouseup'));
-                if(cmd === 'HORN') document.getElementById('btn-horn').dispatchEvent(new Event('mouseup'));
-            }
-        });
+        window.onload = initWebSocket;
     </script>
 </body>
 </html>
