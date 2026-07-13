@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Futuristic RC Car Control</title>
+    <title>Optimized Futuristic RC Car Control</title>
     <style>
         :root {
             --primary-glow: #00f2fe;
@@ -21,7 +21,7 @@
             color: #ffffff;
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
             margin: 0;
-            padding: 15px; 
+            padding: 10px; 
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -52,7 +52,7 @@
             100% { background-color: #120004; }
         }
 
-        /* 📊 Top Status Bar */
+        /* 📊 Top Status Bar - Mobile Optimized */
         .top-status {
             display: flex;
             justify-content: space-between;
@@ -61,103 +61,106 @@
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--glass-border);
-            padding: 12px 20px;
-            border-radius: 20px;
-            font-size: 13px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255,255,255,0.05);
+            padding: 6px 12px; /* උස සහ ඉඩ අඩු කළා */
+            border-radius: 14px;
+            font-size: 11px; /* අකුරු පොඩි කළා */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
             position: relative;
             z-index: 10;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+        }
+
+        @media (min-width: 768px) {
+            .top-status {
+                padding: 12px 20px;
+                font-size: 13px;
+                border-radius: 20px;
+            }
         }
 
         .status-left {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
             flex-wrap: wrap;
         }
 
         .status-item {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             background: var(--glass-bg);
-            padding: 6px 12px;
-            border-radius: 30px;
+            padding: 4px 8px; /* ස්ටේටස් බොක්ස් කුඩා කළා */
+            border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.02);
             font-weight: 500;
-            letter-spacing: 0.5px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        @media (min-width: 768px) {
+            .status-item {
+                gap: 6px;
+                padding: 6px 12px;
+            }
         }
 
         .bulb-status-box, .rgb-status-box, .horn-status-box {
             display: none;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             animation: pulseGlow 1.5s infinite alternate;
-        }
-
-        @keyframes pulseGlow {
-            0% { opacity: 0.7; }
-            100% { opacity: 1; }
         }
 
         /* 🌐 WS Connection Badge */
         .ws-status-badge {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: bold;
-            padding: 5px 12px;
-            border-radius: 30px;
+            padding: 3px 8px;
+            border-radius: 20px;
             background: rgba(255, 0, 85, 0.15);
             color: var(--neon-red);
             border: 1px solid rgba(255, 0, 85, 0.3);
-            text-shadow: 0 0 5px var(--neon-red);
-            box-shadow: 0 0 10px rgba(255, 0, 85, 0.2);
-            transition: all 0.3s ease;
         }
 
         .ws-connected {
             background: rgba(0, 242, 254, 0.15);
             color: var(--primary-glow);
             border: 1px solid rgba(0, 242, 254, 0.3);
-            text-shadow: 0 0 5px var(--primary-glow);
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
         }
 
         .status-gear {
-            font-size: 24px;
+            font-size: 18px;
             color: rgba(255, 255, 255, 0.4);
             cursor: pointer;
-            padding: 4px;
-            transition: all 0.3s ease;
+            padding: 2px;
         }
 
-        .status-gear:hover {
-            color: var(--primary-glow);
-            transform: rotate(60deg) scale(1.1);
+        @media (min-width: 768px) {
+            .status-gear {
+                font-size: 24px;
+                padding: 4px;
+            }
         }
 
         /* ⚙️ Settings Panel */
         .settings-dropdown-panel {
             position: absolute;
-            top: 75px; 
-            right: 15px; 
+            top: 55px; 
+            right: 10px; 
             display: flex;
             flex-direction: column; 
-            gap: 16px; 
+            gap: 12px; 
             background: var(--panel-bg);
-            padding: 20px; 
-            border-radius: 24px; 
+            padding: 15px; 
+            border-radius: 16px; 
             border: 1px solid rgba(0, 242, 254, 0.25);
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             opacity: 0;
-            transform: translateY(-20px) scale(0.93); 
+            transform: translateY(-15px) scale(0.95); 
             pointer-events: none;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 220px; 
+            transition: all 0.3s ease;
+            width: 190px; 
             z-index: 100;
-            box-shadow: 0 30px 70px rgba(0,0,0,0.8);
         }
 
         @media (min-width: 768px) {
@@ -165,6 +168,7 @@
                 top: 85px;
                 right: 40px;
                 width: 240px;
+                padding: 20px;
             }
         }
 
@@ -175,17 +179,16 @@
         }
 
         .panel-label {
-            font-size: 10px; 
+            font-size: 9px; 
             font-weight: 800; 
-            letter-spacing: 1px;
-            margin-bottom: 4px;
+            letter-spacing: 0.5px;
         }
 
         .horizontal-slider {
             -webkit-appearance: none;
             appearance: none;
             width: 100%;
-            height: 5px;
+            height: 4px;
             background: rgba(255, 255, 255, 0.08);
             border-radius: 10px;
             outline: none;
@@ -193,13 +196,12 @@
 
         .horizontal-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             background: var(--primary-glow);
-            box-shadow: 0 0 12px var(--primary-glow);
             cursor: pointer;
-            border: 2px solid #ffffff;
+            border: 1px solid #ffffff;
         }
 
         .color-picker-row {
@@ -210,45 +212,42 @@
 
         .advanced-picker {
             -webkit-appearance: none;
-            -moz-appearance: none;
             appearance: none;
-            width: 55px;
-            height: 32px;
+            width: 45px;
+            height: 26px;
             background: transparent;
             border: none;
             cursor: pointer;
         }
 
         .advanced-picker::-webkit-color-swatch {
-            border-radius: 10px;
-            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         .settings-fs-btn {
-            background: linear-gradient(135deg, rgba(0,242,254,0.1), rgba(0,210,255,0.03));
-            border: 1px solid rgba(0,242,254,0.3);
+            background: rgba(0, 242, 254, 0.05);
+            border: 1px solid rgba(0, 242, 254, 0.3);
             color: var(--primary-glow);
-            padding: 10px;
-            border-radius: 12px;
+            padding: 8px;
+            border-radius: 10px;
             text-align: center;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
         /* 🎨 Game Controls Layout */
         .game-controls {
             display: flex;
             flex-direction: column; 
-            gap: 30px;
+            gap: 20px;
             flex: 1;
-            padding: 10px 0;
+            padding: 5px 0;
             z-index: 1;
             justify-content: center;
         }
 
-        /* 📱 Screen එක හරස් අතට (Landscape) ඇති විට */
         @media (orientation: landscape) or (min-width: 768px) {
             .game-controls {
                 flex-direction: row;
@@ -262,13 +261,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
-        }
-
-        @media (min-width: 768px) {
-            .left-controls-group, .right-controls-group {
-                gap: 20px;
-            }
+            gap: 12px;
         }
 
         .slider-container-vertical {
@@ -276,17 +269,18 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 160px; 
-            width: 60px; 
+            height: 130px; /* උස අඩු කළා */
+            width: 48px;  /* පළල අඩු කළා */
             background: rgba(5, 5, 15, 0.4);
             border: 1px solid var(--glass-border);
-            border-radius: 35px; 
-            box-shadow: inset 0 8px 20px rgba(0,0,0,0.6);
+            border-radius: 25px; 
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.6);
         }
 
         @media (min-width: 768px) {
             .slider-container-vertical {
                 height: 180px;
+                width: 60px;
             }
         }
 
@@ -294,20 +288,27 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 60px; 
-            width: 210px; 
+            height: 48px; 
+            width: 170px; 
             background: rgba(5, 5, 15, 0.4);
             border: 1px solid var(--glass-border);
-            border-radius: 35px; 
-            padding: 0 12px;
-            box-shadow: inset 0 8px 20px rgba(0,0,0,0.6);
+            border-radius: 25px; 
+            padding: 0 10px;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.6);
+        }
+
+        @media (min-width: 768px) {
+            .slider-container-horizontal {
+                height: 60px;
+                width: 210px;
+            }
         }
 
         .vertical-slider {
             -webkit-appearance: none;
             appearance: none;
-            width: 130px;
-            height: 40px; 
+            width: 100px;
+            height: 35px; 
             background: transparent; 
             transform: rotate(-90deg);
             outline: none;
@@ -317,6 +318,7 @@
         @media (min-width: 768px) {
             .vertical-slider {
                 width: 150px;
+                height: 40px;
             }
         }
 
@@ -324,7 +326,7 @@
             -webkit-appearance: none;
             appearance: none;
             width: 100%;
-            height: 40px;
+            height: 35px;
             background: transparent;
             outline: none;
             cursor: pointer;
@@ -334,26 +336,28 @@
         .horizontal-steer-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 44px;
-            height: 44px;
+            width: 34px; /* Slider Knob එක පොඩි කළා */
+            height: 34px;
             border-radius: 50%; 
             background: radial-gradient(circle at 35% 35%, #ffffff, var(--primary-glow));
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.6);
-            border: 2px solid rgba(255,255,255,0.8);
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.6);
+            border: 1.5px solid rgba(255,255,255,0.8);
+        }
+
+        @media (min-width: 768px) {
+            .vertical-slider::-webkit-slider-thumb, 
+            .horizontal-steer-slider::-webkit-slider-thumb {
+                width: 44px;
+                height: 44px;
+            }
         }
 
         .top-row-pad {
             display: flex;
-            gap: 15px; 
+            gap: 12px; 
         }
 
-        @media (min-width: 768px) {
-            .top-row-pad {
-                gap: 20px;
-            }
-        }
-
-        /* Cyberpunk Glass Buttons */
+        /* 📱 Mobile Optimized Buttons (කුඩා කරන ලද බටන්ස්) */
         .glass-btn {
             background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
             border: 1px solid var(--glass-border);
@@ -364,40 +368,56 @@
             justify-content: center;
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
             touch-action: none; 
             -webkit-tap-highlight-color: transparent;
             cursor: pointer;
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.15s ease;
         }
 
         .horn-btn, .park-btn, .light-main-btn, .rgb-toggle-btn {
-            width: 60px;
-            height: 60px;
+            width: 46px; /* 62px සිට 46px දක්වා පොඩි කළා */
+            height: 46px;
             border-radius: 50%;
-            font-size: 22px;
+            font-size: 16px; /* ඉමෝජි ප්‍රමාණය කුඩා කළා */
+        }
+
+        @media (min-width: 768px) {
+            .horn-btn, .park-btn, .light-main-btn, .rgb-toggle-btn {
+                width: 62px;
+                height: 62px;
+                font-size: 24px;
+            }
         }
 
         .horn-btn { color: var(--neon-blue); border-color: rgba(0, 210, 255, 0.2); }
         .horn-btn.active {
             background: linear-gradient(135deg, #00f2fe, #00d2ff) !important;
-            box-shadow: 0 0 25px rgba(0, 242, 254, 0.6) !important;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.6) !important;
             color: #000;
         }
 
         .nitro-btn {
-            font-size: 32px;
-            width: 80px;
-            height: 80px;
+            font-size: 24px;
+            width: 60px; /* 84px සිට 60px දක්වා පොඩි කළා */
+            height: 60px;
             border-radius: 50%;
             background: rgba(255, 0, 85, 0.02);
             border-color: rgba(255, 0, 85, 0.15);
             color: var(--neon-red);
         }
 
+        @media (min-width: 768px) {
+            .nitro-btn {
+                width: 84px;
+                height: 84px;
+                font-size: 34px;
+            }
+        }
+
         .nitro-btn.active {
             background: linear-gradient(135deg, #ff0055, #ff5e00) !important;
-            box-shadow: 0 0 30px rgba(255, 0, 85, 0.7) !important;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.7) !important;
             color: #fff;
         }
 
@@ -409,7 +429,7 @@
 
         .park-active {
             background: linear-gradient(135deg, #ff9900, #ff5500) !important;
-            box-shadow: 0 0 25px rgba(255, 153, 0, 0.6) !important;
+            box-shadow: 0 0 15px rgba(255, 153, 0, 0.6) !important;
             color: #fff;
         }
 
@@ -420,7 +440,7 @@
 
         .light-active {
             background: linear-gradient(135deg, #ffe600, #ff9900) !important;
-            box-shadow: 0 0 25px rgba(255, 230, 0, 0.6) !important;
+            box-shadow: 0 0 15px rgba(255, 230, 0, 0.6) !important;
             color: #000;
         }
 
@@ -431,19 +451,19 @@
 
         .rgb-active {
             background: linear-gradient(135deg, #b624ff, #8000ff) !important;
-            box-shadow: 0 0 25px rgba(182, 36, 255, 0.6) !important;
+            box-shadow: 0 0 15px rgba(182, 36, 255, 0.6) !important;
             color: #fff;
         }
 
-        .glass-btn:active:not(.active) { transform: scale(0.90); }
-        .glass-btn.active { transform: scale(0.90); }
+        .glass-btn:active:not(.active) { transform: scale(0.92); }
+        .glass-btn.active { transform: scale(0.92); }
     </style>
 </head>
 <body id="main-bg">
 
     <div class="top-status">
         <div class="status-left">
-            <div id="sys-mode-display" style="font-weight: 800; color: rgba(255,255,255,0.9); letter-spacing: 1.5px; font-size: 14px;">🎮 CYBER RC</div>
+            <div id="sys-mode-display" style="font-weight: 800; color: rgba(255,255,255,0.9); letter-spacing: 1px;">🎮 CYBER RC</div>
             <div class="status-item"><span id="ws-status" class="ws-status-badge">DISCONNECTED</span></div>
             <div class="status-item"><span>🌡️</span> <span id="temp-display" style="color:var(--neon-orange); font-weight:bold;">34°C</span></div>
             <div class="status-item"><span id="bat-icon">🔋</span> <span id="bat-display" style="color:var(--primary-glow); font-weight:bold;">85%</span></div>
@@ -453,8 +473,8 @@
             
             <div class="status-item rgb-status-box" id="rgb-container"><span>✨</span> <span id="rgb-display" style="color: var(--neon-purple); font-weight:bold;">RGB ON</span></div>
             
-            <div class="status-item"><span style="color: rgba(255,255,255,0.4); font-size:11px; font-weight: bold;">SPD:</span> <span id="speed-display" style="color: var(--primary-glow); font-weight:bold; min-width:35px;">0%</span></div>
-            <div class="status-item"><span style="color: rgba(255,255,255,0.4); font-size:11px; font-weight: bold;">STR:</span> <span id="steer-display" style="color: var(--primary-glow); font-weight:bold; min-width:35px;">0%</span></div>
+            <div class="status-item"><span style="color: rgba(255,255,255,0.4); font-size:9px; font-weight: bold;">SPD:</span> <span id="speed-display" style="color: var(--primary-glow); font-weight:bold; min-width:25px;">0%</span></div>
+            <div class="status-item"><span style="color: rgba(255,255,255,0.4); font-size:9px; font-weight: bold;">STR:</span> <span id="steer-display" style="color: var(--primary-glow); font-weight:bold; min-width:25px;">0%</span></div>
         </div>
         
         <div class="status-gear" id="gear-btn">⚙️</div>
@@ -558,7 +578,6 @@
             }
         }
 
-        // --- 📊 Top Indicators Sync ---
         function syncTopStatusUI() {
             if (isLightOn && headlightBrightnessValue > 0) {
                 bulbContainer.style.display = "flex";
@@ -574,7 +593,6 @@
             }
         }
 
-        // --- ☀️ Headlight Brightness Slider Logic ---
         function updateHeadlightBrightness(val) {
             headlightBrightnessValue = val;
             sendCmd("HEADLIGHT_" + val); 
@@ -589,7 +607,6 @@
             syncTopStatusUI();
         }
 
-        // --- 🎨 RGB Color Picker Logic ---
         function pickCarColor(hexColor) {
             savedHexColor = hexColor.replace("#", "").toUpperCase();
             isRGBOn = true;
@@ -598,7 +615,6 @@
             syncTopStatusUI();
         }
 
-        // --- 🪄 Main RGB Toggle Button ---
         setupSensitiveButton('rgb-toggle-btn', () => {
             isRGBOn = !isRGBOn;
             if(isRGBOn) {
@@ -611,7 +627,6 @@
             syncTopStatusUI();
         }, null, true);
 
-        // --- Headlight Toggle Button ---
         setupSensitiveButton('light-btn', () => {
             isLightOn = !isLightOn;
             if(isLightOn) {
@@ -628,7 +643,6 @@
             syncTopStatusUI();
         }, null, true);
 
-        // --- ⚙️ Menu Control ---
         gearBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             settingsPanel.classList.toggle('show-panel');
@@ -646,7 +660,6 @@
             }
         });
 
-        // --- Fullscreen Logic ---
         function toggleFullScreen() {
             let doc = window.document;
             let docEl = doc.documentElement;
@@ -660,7 +673,6 @@
             settingsPanel.classList.remove('show-panel');
         }
 
-        // --- Touch/Mouse Sensitivity Setup ---
         function setupSensitiveButton(id, startCallback, endCallback, isToggle = false) {
             let btn = document.getElementById(id);
             if(!btn) return;
@@ -685,7 +697,6 @@
             btn.addEventListener('contextmenu', e => e.preventDefault());
         }
 
-        // --- Driving Triggers ---
         setupSensitiveButton('btn-nitro', () => {
             if(isParkMode) return;
             bodyBg.classList.add('nitro-active');
@@ -725,7 +736,6 @@
             }
         }, null, true);
 
-        // --- Sliders Moving Logic ---
         function updateSlider(val) {
             if(isParkMode) { slider.value = 0; speedDisplay.innerText = "0%"; return; }
             speedDisplay.innerText = val + "%";
