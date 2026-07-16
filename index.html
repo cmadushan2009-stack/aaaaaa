@@ -276,6 +276,7 @@
             border: 1px solid var(--glass-border);
             border-radius: 20px; 
             box-shadow: inset 0 4px 10px rgba(0,0,0,0.6);
+            transition: height 0.2s ease;
         }
 
         .slider-container-horizontal {
@@ -300,6 +301,7 @@
             transform: rotate(-90deg);
             outline: none;
             cursor: pointer;
+            transition: width 0.2s ease;
         }
 
         .horizontal-steer-slider {
@@ -362,14 +364,20 @@
                 flex-direction: column-reverse;
                 align-items: center;
                 gap: 8px;
-                /* දකුණු පැත්තේ Controls 10%ක් උඩට */
-                margin-bottom: 10%; 
+                margin-bottom: 10%; /* දකුණු පැත්ත 10%ක් උඩින් */
             }
             
             .left-controls-group {
                 gap: 8px;
-                /* වම් පැත්තේ Controls (Nitro & Vertical Slider) 10%ක් උඩට */
-                margin-bottom: 10%;
+                margin-bottom: 10%; /* වම් පැත්ත (Nitro සහ දිගු Slider එක) පහළ සිට 10%ක් උඩින් */
+            }
+
+            /* Vertical Slider එක දිගුව තබා ගැනීම */
+            .slider-container-vertical {
+                height: 140px; 
+            }
+            .vertical-slider {
+                width: 120px; 
             }
         }
     </style>
