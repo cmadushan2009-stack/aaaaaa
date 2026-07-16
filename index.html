@@ -189,7 +189,7 @@
             cursor: pointer;
         }
 
-        /* 📱 Mobile UI Buttons (Super Micro) */
+        /* 📱 Mobile UI Buttons */
         .glass-btn {
             background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
             border: 1px solid var(--glass-border);
@@ -329,7 +329,7 @@
             gap: 8px; 
         }
 
-        /* 🔄 DEFAULT LAYOUT: PORTRAIT (ෆෝන් එක කෙලින් ඇති විට) */
+        /* 🔄 DEFAULT LAYOUT: PORTRAIT */
         .game-controls {
             display: flex;
             flex-direction: column; 
@@ -346,7 +346,7 @@
             gap: 10px;
         }
 
-        /* 🔄 AUTO-ROTATE: LANDSCAPE LAYOUT (ෆෝන් එක හරස් අතට හැරවූ විට) */
+        /* 🔄 AUTO-ROTATE & FLIP LAYOUT: LANDSCAPE */
         @media (orientation: landscape) {
             body {
                 padding: 5px 15px;
@@ -354,13 +354,13 @@
             .game-controls {
                 flex-direction: row;
                 justify-content: space-between;
-                align-items: flex-end; /* මැද හිස් ඉඩ ඉතිරි කර පහළ කෙළවරට කරයි */
+                align-items: flex-end; 
                 gap: 0;
             }
             
-            /* 🕹️ දකුණු පැත්ත: බටන්ස් උඩට ගෙන, Slider එක යටට කළා */
+            /* 🕹️ මෙතැනදී 'column-reverse' මඟින් Slider එක යටටම තල්ලු කර බටන්ස් ටික උඩට ගෙන එයි */
             .right-controls-group {
-                flex-direction: column;
+                flex-direction: column-reverse;
                 align-items: center;
                 gap: 8px;
             }
