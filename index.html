@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Auto-Rotate Compact RC Car Control</title>
+    <title>Lag-Free Compact RC Car Control</title>
     <style>
         :root {
             --primary-glow: #00f2fe;
@@ -265,6 +265,12 @@
         .glass-btn:active:not(.active) { transform: scale(0.92); }
         .glass-btn.active { transform: scale(0.92); }
 
+        /* 🎛️ SLIDERS OPTIMIZATION FOR LAG REDUCTION */
+        .slider-container-vertical, .slider-container-horizontal {
+            will-change: transform; 
+            transform: translateZ(0); 
+        }
+
         .slider-container-vertical {
             display: flex;
             flex-direction: column;
@@ -303,6 +309,7 @@
             outline: none;
             cursor: pointer;
             transition: width 0.2s ease;
+            touch-action: none; 
         }
 
         .horizontal-steer-slider {
@@ -313,6 +320,7 @@
             background: transparent;
             outline: none;
             cursor: pointer;
+            touch-action: none;
         }
 
         .vertical-slider::-webkit-slider-thumb, 
@@ -373,17 +381,17 @@
                 margin-bottom: 10%; 
             }
 
-            /* 🎛️ Left Vertical Slider එක දිගු කිරීම */
+            /* 🎛️ Left Vertical Slider එක 180px දක්වා දිගු කිරීම */
             .slider-container-vertical {
-                height: 140px; 
+                height: 180px; /* උස 140px සිට 180px දක්වා වැඩි කරන ලදී */
             }
             .vertical-slider {
-                width: 120px; 
+                width: 160px; /* Slider එකේ ක්‍රියාකාරී දිග 160px දක්වා වැඩි කරන ලදී */
             }
 
-            /* 🎛️ Right Horizontal Slider එකත් ඒ හා සමානව දිගු කිරීම */
+            /* 🎛️ Right Horizontal Slider */
             .slider-container-horizontal {
-                width: 180px; /* පළල 150px සිට 180px දක්වා වැඩි කරන ලදී */
+                width: 180px; 
             }
         }
     </style>
@@ -491,10 +499,16 @@
             };
         }
 
-        function sendCmd(cmd) {
-            console.log("Sent: " + cmd);
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(cmd);
+        let lastSentTime = 0;
+        const sendInterval = 45; 
+
+        function sendCmd(cmd, urgent = false) {
+            const now = performance.now();
+            if (urgent || (now - lastSentTime >= sendInterval)) {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(cmd);
+                    lastSentTime = now;
+                }
             }
         }
 
@@ -515,7 +529,7 @@
 
         function updateHeadlightBrightness(val) {
             headlightBrightnessValue = val;
-            sendCmd("HEADLIGHT_" + val); 
+            sendCmd("HEADLIGHT_" + val, true); 
             if(val == 0) {
                 lightBtn.classList.remove('light-active');
                 isLightOn = false;
@@ -530,7 +544,7 @@
             savedHexColor = hexColor.replace("#", "").toUpperCase();
             isRGBOn = true;
             rgbToggleBtn.classList.add('rgb-active');
-            sendCmd("RGB_" + savedHexColor);
+            sendCmd("RGB_" + savedHexColor, true);
             syncTopStatusUI();
         }
 
@@ -538,10 +552,10 @@
             isRGBOn = !isRGBOn;
             if(isRGBOn) {
                 rgbToggleBtn.classList.add('rgb-active');
-                sendCmd("RGB_" + savedHexColor); 
+                sendCmd("RGB_" + savedHexColor, true); 
             } else {
                 rgbToggleBtn.classList.remove('rgb-active');
-                sendCmd("RGB_OFF");
+                sendCmd("RGB_OFF", true);
             }
             syncTopStatusUI();
         }, null, true);
@@ -552,12 +566,12 @@
                 lightBtn.classList.add('light-active');
                 headlightBrightnessValue = 100;
                 headlightSlider.value = 100;
-                sendCmd("HEADLIGHT_100");
+                sendCmd("HEADLIGHT_100", true);
             } else {
                 lightBtn.classList.remove('light-active');
                 headlightBrightnessValue = 0;
                 headlightSlider.value = 0;
-                sendCmd("HEADLIGHT_0");
+                sendCmd("HEADLIGHT_0", true);
             }
             syncTopStatusUI();
         }, null, true);
@@ -602,8 +616,8 @@
                 if(endCallback) endCallback();
             };
 
-            btn.addEventListener('touchstart', handleStart);
-            btn.addEventListener('touchend', handleEnd);
+            btn.addEventListener('touchstart', handleStart, {passive: false});
+            btn.addEventListener('touchend', handleEnd, {passive: false});
             btn.addEventListener('mousedown', handleStart);
             btn.addEventListener('mouseup', handleEnd);
             btn.addEventListener('mouseleave', () => { if(!isToggle) btn.classList.remove('active'); });
@@ -615,21 +629,21 @@
             bodyBg.classList.add('nitro-active');
             speedDisplay.innerText = "100%";
             slider.value = 100;
-            sendCmd('SPEED_100');
-            sendCmd('N_ON');
+            sendCmd('SPEED_100', true);
+            sendCmd('N_ON', true);
         }, () => {
             if(isParkMode) return;
             bodyBg.classList.remove('nitro-active');
             resetSlider();
-            sendCmd('N_OFF');
+            sendCmd('N_OFF', true);
         });
 
         setupSensitiveButton('btn-horn', () => {
             hornAlertContainer.style.display = "flex";
-            sendCmd('HORN_ON');
+            sendCmd('HORN_ON', true);
         }, () => {
             hornAlertContainer.style.display = "none";
-            sendCmd('HORN_OFF');
+            sendCmd('HORN_OFF', true);
         });
 
         setupSensitiveButton('btn-park', () => {
@@ -640,41 +654,47 @@
                 sysModeDisplay.innerText = "🛑 PARK";
                 sysModeDisplay.style.color = "var(--neon-red)";
                 resetSlider(); resetSteerSlider();
-                sendCmd('PARK_ON');
+                sendCmd('PARK_ON', true);
             } else {
                 parkBtn.classList.remove('park-active');
                 sysModeDisplay.innerText = "🎮 CYBER RC";
                 sysModeDisplay.style.color = "rgba(255,255,255,0.9)";
-                sendCmd('PARK_OFF');
+                sendCmd('PARK_OFF', true);
             }
         }, null, true);
 
         function updateSlider(val) {
             if(isParkMode) { slider.value = 0; speedDisplay.innerText = "0%"; return; }
-            speedDisplay.innerText = val + "%";
+            requestAnimationFrame(() => {
+                speedDisplay.innerText = val + "%";
+            });
             sendCmd("SPEED_" + val);
         }
 
         function resetSlider() {
-            slider.value = 0; speedDisplay.innerText = "0%";
-            sendCmd("SPEED_0");
+            slider.value = 0; 
+            speedDisplay.innerText = "0%";
+            sendCmd("SPEED_0", true); 
         }
 
-        slider.addEventListener('touchend', resetSlider);
+        slider.addEventListener('touchend', resetSlider, {passive: true});
         slider.addEventListener('mouseup', resetSlider);
 
         function updateSteerSlider(val) {
             if(isParkMode) { steerSlider.value = 0; steerDisplay.innerText = "0%"; return; }
-            steerDisplay.innerText = val + "%";
+            requestAnimationFrame(() => {
+                steerDisplay.innerText = val + "%";
+            });
             sendCmd("STEER_" + val);
         }
 
         function resetSteerSlider() {
-            steerSlider.value = 0; steerDisplay.innerText = "0%";
-            sendCmd("STEER_0");
+            steerSlider.value = 0; 
+            steerDisplay.innerText = "0%";
+            sendCmd("STEER_0", true);
         }
 
-        steerSlider.addEventListener('touchend', resetSteerSlider);
+        steerSlider.addEventListener('touchend', resetSteerSlider, {passive: true});
         steerSlider.addEventListener('mouseup', resetSteerSlider);
 
         window.onload = initWebSocket;
