@@ -358,24 +358,28 @@
                 gap: 0;
             }
             
-            /* 🕹️ දකුණු පැත්ත: බටන්ස් උඩටත් Slider එක යටටත් සාමාන්‍ය විදිහටම සකස් කළා */
+            /* 🕹️ වම් පැත්ත: Nitro බටන් එක උඩ තීරුව ළඟටම උස්සන්න space-between සහ උස සකස් කළා */
+            .left-controls-group {
+                height: 188px; /* දකුණු පැත්තේ මුළු උසටම සමාන කළා */
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between; /* Nitro එක ඉහළටම සහ Slider එක පහළටම තල්ලු කරයි */
+                align-items: center;
+            }
+
+            .left-controls-group .slider-container-vertical {
+                height: 136px; 
+            }
+
+            .left-controls-group .vertical-slider {
+                width: 116px; 
+            }
+
+            /* 🕹️ දකුණු පැත්ත */
             .right-controls-group {
                 flex-direction: column;
                 align-items: center;
                 gap: 8px;
-            }
-            
-            /* 🕹️ වම් පැත්ත: Speed slider එකේ මැද ලක්ෂ්‍යය දකුණු පැත්තේ Steer Slider එකේ මට්ටමට එන පරිදි උස වෙනස් කළා */
-            .left-controls-group {
-                gap: 8px;
-            }
-
-            .left-controls-group .slider-container-vertical {
-                height: 136px; /* Speed Slider එක උඩට ඉස්සුවා */
-            }
-
-            .left-controls-group .vertical-slider {
-                width: 116px; /* ඇතුළත ධාවන පථය දිගු කළා */
             }
         }
     </style>
