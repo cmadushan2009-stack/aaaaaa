@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Auto-Rotate Compact RC Car Control</title>
+    <title>Landscape Only Compact RC Car Control</title>
     <style>
         :root {
             --primary-glow: #00f2fe;
@@ -17,23 +17,55 @@
         }
 
         body {
-            background: radial-gradient(circle at center, #0f1026, #050510, #000000);
+            background: #000000;
             color: #ffffff;
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
             margin: 0;
-            padding: 10px; 
+            padding: 0;
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
+            align-items: center;
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
-            overflow-x: hidden;
+            overflow: hidden;
+        }
+
+        .orientation-warning {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            z-index: 9999;
+        }
+
+        .orientation-warning h2 {
+            color: var(--primary-glow);
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .orientation-warning p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
+        .main-wrapper {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 5px 15px;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, #0f1026, #050510, #000000);
             position: relative;
         }
 
-        body.nitro-active {
+        body.nitro-active .main-wrapper {
             background: radial-gradient(circle at center, #3a0010, #100005, #000000);
             animation: pulseBg 1s infinite alternate;
         }
@@ -41,6 +73,15 @@
         @keyframes pulseBg {
             0% { background-color: #000000; }
             100% { background-color: #120004; }
+        }
+
+        @media (max-width: 950px) and (orientation: landscape) {
+            .orientation-warning {
+                display: none !important;
+            }
+            .main-wrapper {
+                display: flex !important;
+            }
         }
 
         /* 📊 Top Status Bar */
@@ -57,7 +98,6 @@
             font-size: 10px; 
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
             z-index: 10;
-            margin-bottom: 10px;
         }
 
         .status-left {
@@ -111,7 +151,7 @@
         .settings-dropdown-panel {
             position: absolute;
             top: 45px; 
-            right: 10px; 
+            right: 15px; 
             display: flex;
             flex-direction: column; 
             gap: 10px; 
@@ -177,19 +217,7 @@
             border: 1px solid rgba(255,255,255,0.2);
         }
 
-        .settings-fs-btn {
-            background: rgba(0, 242, 254, 0.05);
-            border: 1px solid rgba(0, 242, 254, 0.3);
-            color: var(--primary-glow);
-            padding: 6px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 9px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* 📱 Mobile UI Buttons */
+        /* UI Buttons */
         .glass-btn {
             background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
             border: 1px solid var(--glass-border);
@@ -270,7 +298,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 110px; 
+            height: 136px; 
             width: 42px;  
             background: rgba(5, 5, 15, 0.4);
             border: 1px solid var(--glass-border);
@@ -294,7 +322,7 @@
         .vertical-slider {
             -webkit-appearance: none;
             appearance: none;
-            width: 90px;
+            width: 116px;
             height: 30px; 
             background: transparent; 
             transform: rotate(-90deg);
@@ -329,117 +357,101 @@
             gap: 8px; 
         }
 
-        /* 🔄 DEFAULT LAYOUT: PORTRAIT */
         .game-controls {
             display: flex;
-            flex-direction: column; 
-            align-items: center;
-            gap: 25px;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-end; 
             flex: 1;
-            justify-content: center;
+            padding-bottom: 5px;
         }
 
-        .left-controls-group, .right-controls-group {
+        .left-controls-group {
+            height: 205px; /* Nitro බටන් එක තවත් 10%ක් ඉහළට ගැනීමට මුළු උස වැඩි කළා */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; 
+            align-items: center;
+        }
+
+        .right-controls-group {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
         }
 
-        /* 🔄 AUTO-ROTATE & FLIP LAYOUT: LANDSCAPE */
-        @media (orientation: landscape) {
-            body {
-                padding: 5px 15px;
-            }
-            .game-controls {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: flex-end; 
-                gap: 0;
-            }
-            
-            /* 🕹️ වම් පැත්ත: Nitro බටන් එක උඩ තීරුව ළඟටම උස්සන්න space-between සහ උස සකස් කළා */
-            .left-controls-group {
-                height: 188px; /* දකුණු පැත්තේ මුළු උසටම සමාන කළා */
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between; /* Nitro එක ඉහළටම සහ Slider එක පහළටම තල්ලු කරයි */
-                align-items: center;
-            }
-
-            .left-controls-group .slider-container-vertical {
-                height: 136px; 
-            }
-
-            .left-controls-group .vertical-slider {
-                width: 116px; 
-            }
-
-            /* 🕹️ දකුණු පැත්ත */
-            .right-controls-group {
-                flex-direction: column;
-                align-items: center;
-                gap: 8px;
-            }
+        /* 🎛️ බටන්ස් හතර තියෙන කොටස Steer Slider එකෙන් 10%ක් (15px-20px) ඉහළට තල්ලු කළා */
+        .buttons-block {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 18px; /* Slider එකට සාපේක්ෂව බටන්ස් ටික උඩට උස්සන්නේ මෙතනින් */
         }
     </style>
 </head>
 <body id="main-bg">
 
-    <div class="top-status">
-        <div class="status-left">
-            <div id="sys-mode-display" style="font-weight: 800; color: rgba(255,255,255,0.9); letter-spacing: 0.5px;">🎮 CYBER RC</div>
-            <div class="status-item"><span id="ws-status" class="ws-status-badge">DISCONNECTED</span></div>
-            <div class="status-item"><span>🌡️</span> <span id="temp-display" style="color:var(--neon-orange); font-weight:bold;">34°C</span></div>
-            <div class="status-item"><span id="bat-icon">🔋</span> <span id="bat-display" style="color:var(--primary-glow); font-weight:bold;">85%</span></div>
-            <div class="status-item horn-status-box" id="horn-alert-container"><span>🔊</span> <span style="color: var(--primary-glow); font-weight:bold;">HORN</span></div>
-            <div class="status-item bulb-status-box" id="bulb-container"><span>💡</span> <span id="led-display" style="color: #ffe600; font-weight:bold;">LED: 100%</span></div>
-            <div class="status-item rgb-status-box" id="rgb-container"><span>✨</span> <span id="rgb-display" style="color: var(--neon-purple); font-weight:bold;">RGB ON</span></div>
-            <div class="status-item"><span style="color: rgba(255,255,255,0.4); font-size:8px; font-weight: bold;">SPD:</span> <span id="speed-display" style="color: var(--primary-glow); font-weight:bold; min-width:20px;">0%</span></div>
-            <div class="status-item"><span style="color: rgba(255,255,255,0.4); font-size:8px; font-weight: bold;">STR:</span> <span id="steer-display" style="color: var(--primary-glow); font-weight:bold; min-width:20px;">0%</span></div>
-        </div>
-        <div class="status-gear" id="gear-btn">⚙️</div>
+    <div class="orientation-warning">
+        <h2>🔄 Landscape Mode Required</h2>
+        <p>දෙවනුව, කරුණාකර ඔබගේ ජංගම දුරකථනය හරස් අතට (Landscape) හරවන්න.</p>
     </div>
 
-    <div class="settings-dropdown-panel" id="settings-panel">
-        <div style="display: flex; flex-direction: column; gap: 6px;">
-            <div class="panel-label" style="color: #ffe600;">☀️ HEADLIGHT BRIGHTNESS</div>
-            <input type="range" min="0" max="100" value="100" class="horizontal-slider" id="headlight-slider" oninput="updateHeadlightBrightness(this.value)">
-        </div>
-        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.06); margin: 4px 0;">
-        <div class="color-picker-row">
-            <div class="panel-label" style="color: var(--neon-purple);">✨ CAR RGB COLOR</div>
-            <input type="color" id="adv-color-picker" class="advanced-picker" value="#ffffff" oninput="pickCarColor(this.value)">
-        </div>
-        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.06); margin: 4px 0;">
-        <div class="settings-fs-btn" onclick="toggleFullScreen()">🖥️ FULLSCREEN MODE</div>
-    </div>
-
-    <div class="game-controls">
-        
-        <div class="left-controls-group">
-            <div class="glass-btn nitro-btn" id="btn-nitro">🔥</div>
-            <div class="slider-container-vertical">
-                <input type="range" min="-100" max="100" value="0" class="vertical-slider" id="throttle-slider" oninput="updateSlider(this.value)">
+    <div class="main-wrapper">
+        <div class="top-status">
+            <div class="status-left">
+                <div id="sys-mode-display" style="font-weight: 800; color: rgba(255,255,255,0.9); letter-spacing: 0.5px;">🎮 CYBER RC</div>
+                <div class="status-item"><span id="ws-status" class="ws-status-badge">DISCONNECTED</span></div>
+                <div class="status-item"><span>🌡️</span> <span id="temp-display" style="color:var(--neon-orange); font-weight:bold;">34°C</span></div>
+                <div class="status-item"><span id="bat-icon">🔋</span> <span id="bat-display" style="color:var(--primary-glow); font-weight:bold;">85%</span></div>
+                <div class="status-item horn-status-box" id="horn-alert-container"><span>🔊</span> <span style="color: var(--primary-glow); font-weight:bold;">HORN</span></div>
+                <div class="status-item bulb-status-box" id="bulb-container"><span>💡</span> <span id="led-display" style="color: #ffe600; font-weight:bold;">LED: 100%</span></div>
+                <div class="status-item rgb-status-box" id="rgb-container"><span>✨</span> <span id="rgb-display" style="color: var(--neon-purple); font-weight:bold;">RGB ON</span></div>
+                <div class="status-item"><span style="color: rgba(255,255,255,0.4); font-size:8px; font-weight: bold;">SPD:</span> <span id="speed-display" style="color: var(--primary-glow); font-weight:bold; min-width:20px;">0%</span></div>
+                <div class="status-item"><span style="color: rgba(255,255,255,0.4); font-size:8px; font-weight: bold;">STR:</span> <span id="steer-display" style="color: var(--primary-glow); font-weight:bold; min-width:20px;">0%</span></div>
             </div>
+            <div class="status-gear" id="gear-btn">⚙️</div>
         </div>
-        
-        <div class="right-controls-group">
-            <div class="top-row-pad">
-                <div class="glass-btn horn-btn" id="btn-horn">🔊</div>
-                <div class="glass-btn park-btn" id="btn-park">🛑</div>
-            </div>
 
-            <div class="top-row-pad">
-                <div class="glass-btn light-main-btn" id="light-btn">🔅</div>
-                <div class="glass-btn rgb-toggle-btn" id="rgb-toggle-btn">✨</div>
+        <div class="settings-dropdown-panel" id="settings-panel">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div class="panel-label" style="color: #ffe600;">☀️ HEADLIGHT BRIGHTNESS</div>
+                <input type="range" min="0" max="100" value="100" class="horizontal-slider" id="headlight-slider" oninput="updateHeadlightBrightness(this.value)">
             </div>
-
-            <div class="slider-container-horizontal">
-                <input type="range" min="-100" max="100" value="0" class="horizontal-steer-slider" id="steer-slider" oninput="updateSteerSlider(this.value)">
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.06); margin: 4px 0;">
+            <div class="color-picker-row">
+                <div class="panel-label" style="color: var(--neon-purple);">✨ CAR RGB COLOR</div>
+                <input type="color" id="adv-color-picker" class="advanced-picker" value="#ffffff" oninput="pickCarColor(this.value)">
             </div>
         </div>
 
+        <div class="game-controls">
+            
+            <div class="left-controls-group">
+                <div class="glass-btn nitro-btn" id="btn-nitro">🔥</div>
+                <div class="slider-container-vertical">
+                    <input type="range" min="-100" max="100" value="0" class="vertical-slider" id="throttle-slider" oninput="updateSlider(this.value)">
+                </div>
+            </div>
+            
+            <div class="right-controls-group">
+                <div class="buttons-block">
+                    <div class="top-row-pad">
+                        <div class="glass-btn horn-btn" id="btn-horn">🔊</div>
+                        <div class="glass-btn park-btn" id="btn-park">🛑</div>
+                    </div>
+
+                    <div class="top-row-pad">
+                        <div class="glass-btn light-main-btn" id="light-btn">🔅</div>
+                        <div class="glass-btn rgb-toggle-btn" id="rgb-toggle-btn">✨</div>
+                    </div>
+                </div>
+
+                <div class="slider-container-horizontal">
+                    <input type="range" min="-100" max="100" value="0" class="horizontal-steer-slider" id="steer-slider" oninput="updateSteerSlider(this.value)">
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <script>
@@ -568,19 +580,6 @@
                 settingsPanel.classList.remove('show-panel');
             }
         });
-
-        function toggleFullScreen() {
-            let doc = window.document;
-            let docEl = doc.documentElement;
-            let requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
-            if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
-                if (requestFullScreen) requestFullScreen.call(docEl);
-            } else {
-                let cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
-                if (cancelFullScreen) cancelFullScreen.call(doc);
-            }
-            settingsPanel.classList.remove('show-panel');
-        }
 
         function setupSensitiveButton(id, startCallback, endCallback, isToggle = false) {
             let btn = document.getElementById(id);
