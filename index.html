@@ -290,6 +290,7 @@
             border-radius: 20px; 
             padding: 0 8px;
             box-shadow: inset 0 4px 10px rgba(0,0,0,0.6);
+            transition: width 0.2s ease;
         }
 
         .vertical-slider {
@@ -364,20 +365,25 @@
                 flex-direction: column-reverse;
                 align-items: center;
                 gap: 8px;
-                margin-bottom: 10%; /* දකුණු පැත්ත 10%ක් උඩින් */
+                margin-bottom: 10%; 
             }
             
             .left-controls-group {
                 gap: 8px;
-                margin-bottom: 10%; /* වම් පැත්ත (Nitro සහ දිගු Slider එක) පහළ සිට 10%ක් උඩින් */
+                margin-bottom: 10%; 
             }
 
-            /* Vertical Slider එක දිගුව තබා ගැනීම */
+            /* 🎛️ Left Vertical Slider එක දිගු කිරීම */
             .slider-container-vertical {
                 height: 140px; 
             }
             .vertical-slider {
                 width: 120px; 
+            }
+
+            /* 🎛️ Right Horizontal Slider එකත් ඒ හා සමානව දිගු කිරීම */
+            .slider-container-horizontal {
+                width: 180px; /* පළල 150px සිට 180px දක්වා වැඩි කරන ලදී */
             }
         }
     </style>
