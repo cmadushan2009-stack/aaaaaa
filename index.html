@@ -57,7 +57,7 @@
             font-size: 10px; 
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
             z-index: 10;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .status-left {
@@ -206,7 +206,7 @@
             transition: all 0.15s ease;
         }
 
-        .horn-btn, .park-btn, .light-main-btn, .rgb-toggle-btn {
+        .horn-btn, .park-btn, .light-main-btn, .rgb-toggle-btn, .signal-btn {
             width: 38px; 
             height: 38px;
             border-radius: 50%;
@@ -262,10 +262,22 @@
             color: #fff;
         }
 
+        .signal-btn {
+            color: var(--neon-orange);
+            border-color: rgba(255, 153, 0, 0.2);
+            font-size: 16px;
+        }
+
+        .signal-active {
+            background: linear-gradient(135deg, #ff9900, #ff5500) !important;
+            box-shadow: 0 0 12px rgba(255, 153, 0, 0.6) !important;
+            color: #fff;
+        }
+
         .glass-btn:active:not(.active) { transform: scale(0.92); }
         .glass-btn.active { transform: scale(0.92); }
 
-        /* 🎛️ SLIDERS OPTIMIZATION FOR LAG REDUCTION */
+        /* 🎛️ SLIDERS OPTIMIZATION */
         .slider-container-vertical, .slider-container-horizontal {
             will-change: transform; 
             transform: translateZ(0); 
@@ -276,13 +288,12 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 110px; 
+            height: 160px; 
             width: 42px;  
             background: rgba(5, 5, 15, 0.4);
             border: 1px solid var(--glass-border);
             border-radius: 20px; 
             box-shadow: inset 0 4px 10px rgba(0,0,0,0.6);
-            transition: height 0.2s ease;
         }
 
         .slider-container-horizontal {
@@ -290,25 +301,23 @@
             align-items: center;
             justify-content: center;
             height: 42px; 
-            width: 150px; 
+            width: 210px; 
             background: rgba(5, 5, 15, 0.4);
             border: 1px solid var(--glass-border);
             border-radius: 20px; 
             padding: 0 8px;
             box-shadow: inset 0 4px 10px rgba(0,0,0,0.6);
-            transition: width 0.2s ease;
         }
 
         .vertical-slider {
             -webkit-appearance: none;
             appearance: none;
-            width: 90px;
+            width: 140px;
             height: 30px; 
             background: transparent; 
             transform: rotate(-90deg);
             outline: none;
             cursor: pointer;
-            transition: width 0.2s ease;
             touch-action: none; 
         }
 
@@ -335,63 +344,41 @@
             border: 1.5px solid rgba(255,255,255,0.8);
         }
 
-        .top-row-pad {
+        .button-row {
             display: flex;
-            gap: 8px; 
-        }
-
-        /* 🔄 DEFAULT LAYOUT: PORTRAIT */
-        .game-controls {
-            display: flex;
-            flex-direction: column; 
+            gap: 15px;
             align-items: center;
-            gap: 25px;
-            flex: 1;
             justify-content: center;
         }
 
-        .left-controls-group, .right-controls-group {
+        /* 🔄 LANDSCAPE MAIN LAYOUT */
+        .game-controls {
+            display: flex;
+            flex-direction: row; 
+            align-items: center;
+            justify-content: space-around;
+            flex: 1;
+            padding: 0 10px;
+        }
+
+        .left-controls-group {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 10px;
         }
 
-        /* 🔄 AUTO-ROTATE & FLIP LAYOUT: LANDSCAPE */
-        @media (orientation: landscape) {
-            body {
-                padding: 5px 15px;
-            }
+        .middle-controls-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        @media (orientation: portrait) {
             .game-controls {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: flex-end; 
-                gap: 0;
-            }
-            
-            .right-controls-group {
-                flex-direction: column-reverse;
-                align-items: center;
-                gap: 8px;
-                margin-bottom: 10%; 
-            }
-            
-            .left-controls-group {
-                gap: 8px;
-                margin-bottom: 10%; 
-            }
-
-            /* 🎛️ Left Vertical Slider එක 180px දක්වා දිගු කිරීම */
-            .slider-container-vertical {
-                height: 180px; /* උස 140px සිට 180px දක්වා වැඩි කරන ලදී */
-            }
-            .vertical-slider {
-                width: 160px; /* Slider එකේ ක්‍රියාකාරී දිග 160px දක්වා වැඩි කරන ලදී */
-            }
-
-            /* 🎛️ Right Horizontal Slider */
-            .slider-container-horizontal {
-                width: 180px; 
+                flex-direction: column;
+                gap: 20px;
             }
         }
     </style>
@@ -436,19 +423,21 @@
             </div>
         </div>
         
-        <div class="right-controls-group">
-            <div class="top-row-pad">
-                <div class="glass-btn horn-btn" id="btn-horn">🔊</div>
-                <div class="glass-btn park-btn" id="btn-park">🛑</div>
-            </div>
-
-            <div class="top-row-pad">
-                <div class="glass-btn light-main-btn" id="light-btn">🔅</div>
-                <div class="glass-btn rgb-toggle-btn" id="rgb-toggle-btn">✨</div>
+        <div class="middle-controls-group">
+            <div class="button-row">
+                <div class="glass-btn signal-btn" id="btn-signal-l">⬅️</div>
+                <div class="glass-btn signal-btn" id="btn-signal-r">➡️</div>
             </div>
 
             <div class="slider-container-horizontal">
                 <input type="range" min="-100" max="100" value="0" class="horizontal-steer-slider" id="steer-slider" oninput="updateSteerSlider(this.value)">
+            </div>
+
+            <div class="button-row">
+                <div class="glass-btn light-main-btn" id="light-btn">🔅</div>
+                <div class="glass-btn horn-btn" id="btn-horn">🔊</div>
+                <div class="glass-btn rgb-toggle-btn" id="rgb-toggle-btn">✨</div>
+                <div class="glass-btn park-btn" id="btn-park">🛑</div>
             </div>
         </div>
 
@@ -470,6 +459,8 @@
         let isLightOn = false;
         let isParkMode = false; 
         let isRGBOn = false;
+        let isSignalLOn = false;
+        let isSignalROn = false;
         let savedHexColor = "FFFFFF"; 
         let headlightBrightnessValue = 100; 
 
@@ -574,6 +565,36 @@
                 sendCmd("HEADLIGHT_0", true);
             }
             syncTopStatusUI();
+        }, null, true);
+
+        setupSensitiveButton('btn-signal-l', () => {
+            isSignalLOn = !isSignalLOn;
+            let sigLBtn = document.getElementById('btn-signal-l');
+            let sigRBtn = document.getElementById('btn-signal-r');
+            if(isSignalLOn) {
+                sigLBtn.classList.add('signal-active');
+                sigRBtn.classList.remove('signal-active');
+                isSignalROn = false;
+                sendCmd("SIGNAL_L_ON", true);
+            } else {
+                sigLBtn.classList.remove('signal-active');
+                sendCmd("SIGNAL_L_OFF", true);
+            }
+        }, null, true);
+
+        setupSensitiveButton('btn-signal-r', () => {
+            isSignalROn = !isSignalROn;
+            let sigLBtn = document.getElementById('btn-signal-l');
+            let sigRBtn = document.getElementById('btn-signal-r');
+            if(isSignalROn) {
+                sigRBtn.classList.add('signal-active');
+                sigLBtn.classList.remove('signal-active');
+                isSignalLOn = false;
+                sendCmd("SIGNAL_R_ON", true);
+            } else {
+                sigRBtn.classList.remove('signal-active');
+                sendCmd("SIGNAL_R_OFF", true);
+            }
         }, null, true);
 
         gearBtn.addEventListener('click', (e) => {
