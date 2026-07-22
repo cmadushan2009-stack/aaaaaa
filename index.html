@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dynamic RC Cyber Dashboard with Exact Zero Snap & Haptics</title>
+    <title>Dynamic RC Cyber Dashboard with Wi-Fi Setup & Zero Lock</title>
     <style>
         :root {
             --primary-glow: #00f2fe;
@@ -313,15 +313,34 @@
 
         .modal-input {
             width: 100%;
-            padding: 10px;
+            padding: 10px 12px;
             border-radius: 10px;
             border: 1px solid var(--primary-glow);
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             color: #fff;
             font-size: 12px;
             box-sizing: border-box;
             outline: none;
-            text-align: center;
+            text-align: left;
+        }
+
+        .modal-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            width: 100%;
+        }
+
+        .input-label {
+            font-size: 9px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.5px;
         }
 
         .modal-close-btn {
@@ -431,7 +450,7 @@
             color: #fff;
         }
 
-        /* 🎛️ Sliders */
+        /* 🎛️ Sliders & Snap Lock Effect */
         .slider-container-vertical {
             display: flex;
             flex-direction: column;
@@ -468,6 +487,7 @@
             outline: none;
             cursor: pointer;
             touch-action: none; 
+            transition: filter 0.1s ease;
         }
 
         .horizontal-steer-slider {
@@ -479,6 +499,7 @@
             outline: none;
             cursor: pointer;
             touch-action: none;
+            transition: filter 0.1s ease;
         }
 
         .vertical-slider::-webkit-slider-thumb, 
@@ -491,6 +512,14 @@
             background: radial-gradient(circle at 35% 35%, #ffffff, var(--primary-glow));
             box-shadow: 0 0 10px rgba(0, 242, 254, 0.6);
             border: 1.5px solid rgba(255,255,255,0.8);
+            transition: transform 0.08s ease, box-shadow 0.08s ease;
+        }
+
+        /* 🔒 Haptics Zero Lock Class for Thumb */
+        .slider-zero-locked::-webkit-slider-thumb {
+            transform: scale(1.25);
+            box-shadow: 0 0 18px rgba(0, 242, 254, 1), 0 0 8px #ffffff;
+            background: radial-gradient(circle at 35% 35%, #ffffff, #00ffaa);
         }
 
         .button-row {
@@ -656,7 +685,7 @@
             100% { transform: translateX(-100%); }
         }
 
-        /* 📡 SENSOR DATA WIDGET (BLANK BOX) */
+        /* 📡 SENSOR DATA WIDGET */
         .sensor-widget-container {
             display: none;
             width: 100%;
@@ -690,7 +719,27 @@
 </head>
 <body id="main-bg">
 
-    <div class="modal-overlay show-modal" id="start-mode-modal">
+    <div class="modal-overlay show-modal" id="wifi-setup-modal">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title">📶 Connect Wi-Fi</div>
+            
+            <div class="input-group">
+                <span class="input-label">Wi-Fi Name (SSID)</span>
+                <input type="text" id="wifi-ssid" class="modal-input" placeholder="Enter Wi-Fi Name">
+            </div>
+
+            <div class="input-group">
+                <span class="input-label">Password</span>
+                <input type="password" id="wifi-pass" class="modal-input" placeholder="Enter Password">
+            </div>
+
+            <div class="modal-option-btn" style="background: var(--primary-glow); color: #000; margin-top: 5px;" onclick="submitWifiCredentials()">
+                🔗 Connect & Continue
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="start-mode-modal">
         <div class="modal-box" onclick="event.stopPropagation()">
             <div class="modal-title">Select System Mode</div>
             <div class="modal-option-btn" onclick="initSelectedMode('RC')">🎮 RC Car Mode</div>
@@ -827,6 +876,7 @@
         const rgbToggleBtn = document.getElementById('rgb-toggle-btn');
         const wsStatusBadge = document.getElementById('ws-status');
         
+        const wifiSetupModal = document.getElementById('wifi-setup-modal');
         const startModeModal = document.getElementById('start-mode-modal');
         const widgetModal = document.getElementById('widget-modal');
         const textInputBox = document.getElementById('text-input-box');
@@ -873,13 +923,43 @@
         let isParkMode = false; 
         let isRGBOn = false;
         let activeSignal = null; 
-        let currentSystemMode = "RC"; 
+        let currentSystemMode = "RC";
 
-        // Vibration Helper Function
+        /* 📱 UNLOCK HAPTICS ON FIRST TOUCH */
+        let hapticUnlocked = false;
+        function enableHaptics() {
+            if (!hapticUnlocked) {
+                if (navigator.vibrate) {
+                    navigator.vibrate(10); // Warm up vibration engine
+                }
+                hapticUnlocked = true;
+            }
+        }
+        document.addEventListener('touchstart', enableHaptics, { once: true });
+        document.addEventListener('mousedown', enableHaptics, { once: true });
+
+        // Enhanced Vibration Function
         function triggerHapticFeedback() {
             if (navigator.vibrate) {
-                navigator.vibrate(45); // 45ms pulse for clear zero feel
+                // Dual pattern vibration for better feedback
+                navigator.vibrate([35, 20, 35]); 
             }
+        }
+
+        /* 📶 SUBMIT WI-FI CREDENTIALS */
+        function submitWifiCredentials() {
+            const ssid = document.getElementById('wifi-ssid').value.trim();
+            const pass = document.getElementById('wifi-pass').value.trim();
+
+            if (!ssid) {
+                alert("Please enter a Wi-Fi Name!");
+                return;
+            }
+
+            sendCmd("WIFI_CONNECT_" + ssid + "_" + pass);
+
+            wifiSetupModal.classList.remove('show-modal');
+            startModeModal.classList.add('show-modal');
         }
 
         let ws;
@@ -1147,7 +1227,7 @@
             sendCmd('HORN_OFF', true);
         });
 
-        /* 🎛️ SLIDER CONTROLS WITH EXACT ZERO HAPTIC LOCK */
+        /* 🎛️ SLIDER CONTROLS WITH EXACT ZERO SNAP LOCK & VIBRATION */
         let throttleSnapped = false;
         let steerSnapped = false;
 
@@ -1156,14 +1236,21 @@
             
             let parsedVal = parseInt(val);
 
-            // Trigger Vibration ONLY at Exact ZERO (0)
+            // Exact ZERO Lock and Vibration Trigger
             if (parsedVal === 0) {
                 if (!throttleSnapped) {
                     triggerHapticFeedback(); 
+                    slider.classList.add('slider-zero-locked');
                     throttleSnapped = true;
+
+                    // Brief Visual Snap Delay
+                    setTimeout(() => {
+                        slider.classList.remove('slider-zero-locked');
+                    }, 120);
                 }
             } else {
                 throttleSnapped = false;
+                slider.classList.remove('slider-zero-locked');
             }
 
             currentThrottleY = parsedVal;
@@ -1177,14 +1264,21 @@
             
             let parsedVal = parseInt(val);
 
-            // Trigger Vibration ONLY at Exact ZERO (0)
+            // Exact ZERO Lock and Vibration Trigger
             if (parsedVal === 0) {
                 if (!steerSnapped) {
                     triggerHapticFeedback(); 
+                    steerSlider.classList.add('slider-zero-locked');
                     steerSnapped = true;
+
+                    // Brief Visual Snap Delay
+                    setTimeout(() => {
+                        steerSlider.classList.remove('slider-zero-locked');
+                    }, 120);
                 }
             } else {
                 steerSnapped = false;
+                steerSlider.classList.remove('slider-zero-locked');
             }
 
             currentSteerX = parsedVal;
