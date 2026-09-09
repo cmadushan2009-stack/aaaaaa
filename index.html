@@ -857,6 +857,10 @@
             </div>
 
             <div class="sensor-widget-container" id="widget-sensor-container"></div>
+            <!-- ➕ Cam Mode එක සඳහා Full Fit iframe එක පමණක් -->
+            <div id="widget-cam-container" style="display: none; width: 100%; height: 100%; overflow: hidden; border-radius: 8px;">
+                <iframe id="cam-web-frame" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+             </div>
         </div>
         
         <div class="right-controls-group">
@@ -1114,15 +1118,17 @@
     widgetTextContainer.style.display = "none";
     widgetSensorContainer.style.display = "none";
 
+    const camContainer = document.getElementById('widget-cam-container');
+    if(camContainer) camContainer.style.display = "none";
+
     if (dateTimeInterval) clearInterval(dateTimeInterval);
     if (textTimer) clearTimeout(textTimer);
 
-    // මැද ඇති Center Box Element එක ලබා ගැනීම
     const centerBox = document.querySelector('.center-box');
 
     if (type === 'FACE') {
         widgetFace.style.display = "flex";
-        if(centerBox) centerBox.classList.remove('expanded'); // සාමාන්‍ය ප්‍රමාණයට හැරවීම
+        if(centerBox) centerBox.classList.remove('expanded');
     } else if (type === 'DATETIME') {
         widgetDateTime.style.display = "flex";
         updateDateTime();
@@ -1132,9 +1138,17 @@
         widgetSensorContainer.style.display = "flex";
         if(centerBox) centerBox.classList.remove('expanded');
     } else if (type === 'CAM') {
-        // Cam Mode එකේදී මැද කොටුව විශාල වේ
         if(centerBox) centerBox.classList.add('expanded');
+        
+        const camFrame = document.getElementById('cam-web-frame');
+        if(camContainer && camFrame) {
+            camContainer.style.display = "flex";
+            
+            // 👇 මෙතැනට ඔබගේ ESP32-CAM එකේ IP එක හෝ URL එක ලබාදෙන්න http://192.168.4.2
+            camFrame.src = "https://res.cloudinary.com/dqewxo0gk/video/upload/v1780334986/3831837-uhd_2160_4096_25fps_e2lkb7.mp4"; 
+        }
     }
+   
             closeWidgetModal();
         }
 
