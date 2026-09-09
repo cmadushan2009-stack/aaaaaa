@@ -554,6 +554,18 @@
             box-sizing: border-box;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
+        /* center-box එක Smooth ලෙස විශාල වීමට transition එකක් */
+        .center-box {
+           transition: all 0.4s ease !important;
+        }
+
+       /* Cam Mode එකේදී කොටුව විශාල වන ප්‍රමාණය */
+        .center-box.expanded {
+          width: 65vw !important;
+          height: 45vw !important;
+          max-width: 420px !important;
+          max-height: 280px !important;
+        }
 
         .center-box:hover {
             border-color: var(--primary-glow);
@@ -1094,25 +1106,34 @@
         }
 
         function activateWidget(type) {
-            activeWidget = type;
+    activeWidget = type;
 
-            widgetFace.style.display = "none";
-            widgetDateTime.style.display = "none";
-            widgetTextContainer.style.display = "none";
-            widgetSensorContainer.style.display = "none";
+    widgetFace.style.display = "none";
+    widgetDateTime.style.display = "none";
+    widgetTextContainer.style.display = "none";
+    widgetSensorContainer.style.display = "none";
 
-            if (dateTimeInterval) clearInterval(dateTimeInterval);
-            if (textTimer) clearTimeout(textTimer);
+    if (dateTimeInterval) clearInterval(dateTimeInterval);
+    if (textTimer) clearTimeout(textTimer);
 
-            if (type === 'FACE') {
-                widgetFace.style.display = "flex";
-            } else if (type === 'DATETIME') {
-                widgetDateTime.style.display = "flex";
-                updateDateTime();
-                dateTimeInterval = setInterval(updateDateTime, 1000);
-            } else if (type === 'SENSOR') {
-                widgetSensorContainer.style.display = "block";
-            }
+    // මැද ඇති Center Box Element එක ලබා ගැනීම
+    const centerBox = document.querySelector('.center-box');
+
+    if (type === 'FACE') {
+        widgetFace.style.display = "flex";
+        if(centerBox) centerBox.classList.remove('expanded'); // සාමාන්‍ය ප්‍රමාණයට හැරවීම
+    } else if (type === 'DATETIME') {
+        widgetDateTime.style.display = "flex";
+        updateDateTime();
+        dateTimeInterval = setInterval(updateDateTime, 1000);
+        if(centerBox) centerBox.classList.remove('expanded');
+    } else if (type === 'SENSOR') {
+        widgetSensorContainer.style.display = "flex";
+        if(centerBox) centerBox.classList.remove('expanded');
+    } else if (type === 'CAM') {
+        // Cam Mode එකේදී මැද කොටුව විශාල වේ
+        if(centerBox) centerBox.classList.add('expanded');
+    }
             closeWidgetModal();
         }
 
