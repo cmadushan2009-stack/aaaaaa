@@ -881,6 +881,99 @@
             font-size: 0.9rem;
             margin-top: 4px;
         }
+
+        .thermometer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            margin: 15px auto;
+        }
+
+        .stem-outer {
+            width: 40px;
+            height: 140px;
+            border: 3px solid rgba(255, 255, 255, 0.85);
+            border-bottom: none;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 3px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: flex-end;
+            background: rgba(0, 0, 0, 0.25);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .thermo-ticks {
+            position: absolute;
+            left: -22px;
+            top: 10px;
+            bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.45);
+            pointer-events: none;
+        }
+
+        .stem-level {
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(180deg, #34c759, #30d158);
+            border-radius: 12px 12px 0 0;
+            transition: height 0.6s ease, background 0.6s ease;
+            box-shadow: 0 0 15px rgba(52, 199, 89, 0.6);
+            position: relative;
+        }
+
+        .bulb-outer {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(255, 255, 255, 0.85);
+            border-radius: 50%;
+            margin-top: -8px;
+            background: rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 2;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bulb-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(180deg, #34c759, #30d158);
+            box-shadow: 0 0 20px rgba(52, 199, 89, 0.7);
+            transition: background 0.6s ease;
+        }
+
+        .temperature {
+            color: #ffffff;
+            font-size: 2.2rem;
+            font-weight: 800;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+            padding: 4px 14px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 
@@ -946,8 +1039,11 @@
             <div class="status-item" id="temp-box">
                 <span class="temp-snow-icon">❄️</span>
                 <span class="temp-sun-icon">☀️</span>
-                <span id="temp-icon">🌡️</span>
-                <span id="temp-display" style="color:var(--neon-orange); font-weight:bold;">34°C</span>
+                <div class="status-item" id="temp-box" onclick="openTempModal()" style="cursor: pointer;">
+                    <span id="temp-icon">🌡️</span>
+                    <span id="temp-display" style="color:var(--primary-glow); font-weight:bold;">24°C</span>
+                </div>
+                
             </div>
 
             <div class="status-item" id="bat-box" onclick="openBatteryModal()" style="cursor: pointer;">
@@ -1058,6 +1154,37 @@
                 <div class="info-group">
                     <div class="percentage" id="percentageText">--%</div>
                     <div class="status" id="statusText">Fetching data...</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-overlay" id="temp-modal" onclick="closeTempModal()">
+            <div class="modal-box" onclick="event.stopPropagation()">
+                <span class="modal-close-btn" onclick="closeTempModal()">✖</span>
+                <div class="modal-title">Temperature Status</div>
+
+                <div class="thermometer" id="thermoInteractive">
+                    <div class="stem-outer" id="stemOuter">
+                        <div class="thermo-ticks">
+                            <span>50°</span>
+                            <span>35°</span>
+                            <span>20°</span>
+                            <span>0°</span>
+                        </div>
+                        <div class="stem-level" id="stemLevel">
+                            <div id="bubbleContainer" style="width:100%; height:100%; position:relative;"></div>
+                        </div>
+                    </div>
+                    <div class="bulb-outer" id="bulbOuter">
+                        <div class="bulb-inner" id="bulbInner"></div>
+                    </div>
+                </div>
+
+                <div class="info-group" id="infoInteractive">
+                    <div class="temperature" id="temperatureText">24°C</div>
+                    <div class="status-badge" id="statusBadge">
+                        <span id="statusIcon">🌿</span>
+                        <span id="statusText">Optimal</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1582,6 +1709,70 @@
             } else {
                 statusText.innerText = 'Battery API not supported';
             }
+        }
+        let currentTemp = 24;
+
+        function openTempModal() {
+            document.getElementById('temp-modal').classList.add('show-modal');
+            updateTemperatureUI(currentTemp);
+        }
+
+        function closeTempModal() {
+            document.getElementById('temp-modal').classList.remove('show-modal');
+        }
+
+        function updateTemperatureUI(temp) {
+            currentTemp = Math.min(Math.max(temp, 0), 50);
+
+            const stemLevel = document.getElementById('stemLevel');
+            const bulbInner = document.getElementById('bulbInner');
+            const temperatureText = document.getElementById('temperatureText');
+            const statusBadge = document.getElementById('statusBadge');
+            const statusIcon = document.getElementById('statusIcon');
+            const statusText = document.getElementById('statusText');
+
+            if (!stemLevel) return;
+
+            const fillPercent = Math.min(Math.max((currentTemp / 50) * 100, 4), 100);
+            temperatureText.innerText = currentTemp + '°C';
+            stemLevel.style.height = fillPercent + '%';
+
+            let colorGradient = '';
+            let shadowColor = '';
+            let statusMessage = '';
+            let icon = '';
+
+            if (currentTemp < 18) {
+                colorGradient = 'linear-gradient(180deg, #00d2ff, #3a7bd5)';
+                shadowColor = 'rgba(0, 210, 255, 0.7)';
+                statusMessage = 'Cool';
+                icon = '❄️';
+            } else if (currentTemp <= 28) {
+                colorGradient = 'linear-gradient(180deg, #34c759, #30d158)';
+                shadowColor = 'rgba(52, 199, 89, 0.7)';
+                statusMessage = 'Optimal';
+                icon = '🌿';
+            } else if (currentTemp <= 35) {
+                colorGradient = 'linear-gradient(180deg, #ff9f0a, #ff9500)';
+                shadowColor = 'rgba(255, 159, 10, 0.7)';
+                statusMessage = 'Warm';
+                icon = '☀️';
+            } else {
+                colorGradient = 'linear-gradient(180deg, #ff453a, #ff3b30)';
+                shadowColor = 'rgba(255, 69, 58, 0.8)';
+                statusMessage = 'Hot';
+                icon = '🔥';
+            }
+
+            stemLevel.style.background = colorGradient;
+            stemLevel.style.boxShadow = `0 0 15px ${shadowColor}`;
+            bulbInner.style.background = colorGradient;
+            bulbInner.style.boxShadow = `0 0 20px ${shadowColor}`;
+
+            statusBadge.style.boxShadow = `0 0 10px ${shadowColor}`;
+            statusBadge.style.borderColor = shadowColor;
+            statusText.innerText = statusMessage;
+            statusIcon.innerText = icon;
         }
     </script>
 </body>
